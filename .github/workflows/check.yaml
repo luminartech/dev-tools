@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: ${{ matrix.py }}
       - name: Install tox
-        run: python -m pip install tox-gh>=1.2pr
+        run: python -m pip install tox-gh poetry==1.8.3
       - name: Setup test suite
         run: tox -vv --notest
       - name: Run test suite
