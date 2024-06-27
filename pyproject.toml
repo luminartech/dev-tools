@@ -1,0 +1,93 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.docformatter]
+in-place = true
+recursive = true
+wrap-summaries = 88
+wrap-descriptions = 81
+
+[tool.flake8]
+max-line-length = 120
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+no_implicit_optional = true
+show_column_numbers = true
+show_error_codes = true
+show_error_context = true
+strict_equality = true
+strict_optional = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+[tool.poetry]
+name = "dev-tools"
+version = "0.1.0"
+description = ""
+authors = ["BRE <bre@luminartech.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pre-commit = ">=3.5.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7"
+pytest-cov = ">=4"
+pyfakefs = ">=5"
+ruamel-yaml = ">=0.18.6"
+
+[tool.poetry.scripts]
+check-jira-reference-in-todo = "dev_tools.check_jira_reference_in_todo:main"
+check-number-of-lines-count = "dev_tools.check_number_of_lines_count:main"
+check-shellscript-set-options = "dev_tools.check_shellscript_set_options:main"
+check-useless-exclude-paths-hooks = "dev_tools.check_useless_exclude_paths_hooks:main"
+
+[tool.pylint.FORMAT]
+max-line-length = 120
+
+[tool.pylint.MASTER]
+# Add files or directories to the blacklist. They should be base names, not paths.
+ignore = ["venv"]
+
+[tool.pylint."MESSAGES CONTROL"]
+# Only show warnings with the listed confidence levels. Leave empty to show
+# all. Valid levels: HIGH, INFERENCE, INFERENCE_FAILURE, UNDEFINED
+confidence = ""
+disable = [
+  "missing-function-docstring",
+  "import-error" # disabled since pre-commit runs pylint in a separate venv
+]
+
+[tool.pytest.ini_options]
+addopts = "--cov-report term-missing --cov=dev_tools -vv"
+testpaths = [
+  "tests"
+]
+
+[tool.ruff]
+fix = true
+target-version = "py38"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "A00",
+  "ANN001",
+  "ANN101",
+  "COM812",
+  "D",
+  "FA100",
+  "S101",
+  "T201"
+]
