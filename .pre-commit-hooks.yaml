@@ -1,0 +1,60 @@
+- id: check-build-file-without-extensions
+  name: check for BUILD files without extensions
+  description: Check that BUILD files have a .bazel ending
+  entry: BUILD files must have a .bazel ending
+  language: fail
+  files: "BUILD$"
+- id: check-snake-case
+  name: check snake case
+  description: Check that all files are snake_case
+  entry: file names and paths must be snake_case
+  language: fail
+  files: "-|[A-Z]"
+  types_or:
+    - c++
+    - cuda
+    - python
+    - shell
+- id: check-cpp-and-cu-unit-test-naming-pattern
+  name: Check c++ and cu unit test naming pattern
+  description: Check that all c++ and cu unit test files end with _test.cpp
+  entry: cpp and cu unit test files must end with _test.cpp
+  language: fail
+  files: '.*(?<=test)(?<!_test)\.(cpp|cu)$'
+  types_or:
+    - c++
+    - cuda
+- id: check-no-dashes
+  name: check no dashes
+  description: Check that files do not use dashes
+  entry: file names and paths must not use dashes
+  language: fail
+  files: "-"
+  types_or:
+    - markdown
+- id: check-number-of-lines-count
+  name: Check Number of Lines
+  description: Check that number of lines do not exceed max-lines.
+  entry: check-number-of-lines-count
+  language: python
+  types: [shell]
+  args: [--max-lines=30]
+- id: check-shellscript-set-options
+  name: Check 'set' options
+  description: Check if options are set with 'set'.
+  entry: check-shellscript-set-options
+  language: python
+  types: [shell]
+- id: check-jira-reference-in-todo
+  name: Check Jira reference in TODO
+  description: Check for TODOs that do not follow the JIRA format 'TODO(ABC-1234):'
+  entry: check-jira-reference-in-todo
+  language: python
+  exclude_types:
+    - svg
+- id: check-non-existing-and-duplicate-excludes
+  name: Check non-existing and duplicate excludes in pre-commit-config
+  description: Check for non existing and duplicate paths in pre-commit-config
+  entry: check-useless-exclude-paths-hooks
+  language: python
+  additional_dependencies: ["pre-commit >= 3.5.0"]
