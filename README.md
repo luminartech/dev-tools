@@ -1,6 +1,7 @@
 # Dev Tools
 
 [![Check](https://github.com/luminartech/dev-tools/actions/workflows/check.yaml/badge.svg)](https://github.com/luminartech/dev-tools/actions/workflows/check.yaml)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/luminartech/dev-tools/master.svg)](https://results.pre-commit.ci/latest/github/luminartech/dev-tools/master)
 
 This is a collection of Luminar's development tools.
 These tools are used to help developers in their day-to-day tasks.
