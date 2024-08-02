@@ -8,6 +8,8 @@ These tools are used to help developers in their day-to-day tasks.
 
 <!-- mdformat-toc start --slug=github --no-anchors --maxlevel=6 --minlevel=2 -->
 
+- [Tools](#tools)
+  - [Configure VS Code for Bazel](#configure-vs-code-for-bazel)
 - [Hooks](#hooks)
   - [`check-build-file-without-extensions`](#check-build-file-without-extensions)
   - [`check-snake-case`](#check-snake-case)
@@ -20,6 +22,21 @@ These tools are used to help developers in their day-to-day tasks.
 - [Contributing](#contributing)
 
 <!-- mdformat-toc end -->
+
+## Tools
+
+### Configure VS Code for Bazel
+
+If you want to debug C++ Bazel targets in VS Code, you can use the `configure-vscode-for-bazel` to generate a `.vscode/launch.json` file.
+This file then contains targets for debugging in VS Code.
+To generate a set of targets, run the following command:
+
+```shell
+configure-vscode-for-bazel //path/to/your/target/...
+```
+
+This will be forwarded to a `bazel query` listing all `cc_binary` and `cc_test` targets.
+Make sure you compile with debug symbols (`--compilation_mode=dbg`) enabled.
 
 ## Hooks
 
