@@ -27,9 +27,9 @@ These tools are used to help developers in their day-to-day tasks.
 
 ### Configure VS Code for Bazel
 
-If you want to debug C++ Bazel targets in VS Code, you can use the `configure-vscode-for-bazel` to generate a `.vscode/launch.json` file.
-This file then contains targets for debugging in VS Code.
-To generate a set of targets, run the following command:
+If you want to debug C++ Bazel targets in VS Code, you can use `configure-vscode-for-bazel` to generate a `.vscode/launch.json` file.
+This file then contains all targets for debugging in VS Code.
+To generate a defined set of targets, run
 
 ```shell
 configure-vscode-for-bazel //path/to/your/target/...
