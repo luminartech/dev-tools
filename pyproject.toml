@@ -47,6 +47,7 @@ pyfakefs = ">=5"
 ruamel-yaml = ">=0.18.6"
 
 [tool.poetry.scripts]
+configure-vscode-for-bazel = "dev_tools.configure_vscode_for_bazel:main"
 check-jira-reference-in-todo = "dev_tools.check_jira_reference_in_todo:main"
 check-number-of-lines-count = "dev_tools.check_number_of_lines_count:main"
 check-shellscript-set-options = "dev_tools.check_shellscript_set_options:main"
@@ -76,6 +77,7 @@ testpaths = [
 
 [tool.ruff]
 fix = true
+unsafe-fixes = true
 target-version = "py38"
 line-length = 120
 
@@ -89,5 +91,6 @@ ignore = [
   "D",
   "FA100",
   "S101",
+  "S603",
   "T201"
 ]
