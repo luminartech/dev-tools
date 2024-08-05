@@ -45,16 +45,16 @@ repos:
         args: [--branch, master]
       - id: trailing-whitespace
   - repo: https://github.com/mattlqx/pre-commit-search-and-replace
-    rev: v1.1.2
+    rev: v1.1.3
     hooks:
       - id: search-and-replace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.0
+    rev: v0.5.6
     hooks:
       - id: ruff-format
       - id: ruff
   - repo: https://github.com/python-poetry/poetry
-    rev: 1.8.3
+    rev: 1.8.0
     hooks:
       - id: poetry-check
       - id: poetry-lock
@@ -91,11 +91,11 @@ repos:
       - id: yamllint
         args: [--strict]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.1
+    rev: v1.11.1
     hooks:
       - id: mypy
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.16.0
+    rev: v3.17.0
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -106,7 +106,7 @@ repos:
         args: [--in-place, --config, pyproject.toml]
         additional_dependencies: [tomli==2.0.1]
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.28.6
+    rev: 0.29.1
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
@@ -115,7 +115,7 @@ repos:
       - id: actionlint
         additional_dependencies: [pyflakes>=3.1.0, shellcheck-py>=0.9.0.5]
   - repo: https://github.com/crate-ci/typos
-    rev: v1.22.9
+    rev: v1.23.6
     hooks:
       - id: typos
         exclude_types:
