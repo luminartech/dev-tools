@@ -71,6 +71,10 @@ repos:
     rev: v2.3.1
     hooks:
       - id: autoflake
+  - repo: https://github.com/MarcoGorelli/auto-walrus
+    rev: 0.3.4
+    hooks:
+      - id: auto-walrus
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
     rev: 3.0.0
     hooks:
