@@ -29,9 +29,8 @@ def find_files_with_incorrect_jira_reference_in_todo(files: List[Path]) -> List[
 
 
 def has_any_file_incorrect_jira_reference_in_todo(files: List[Path]) -> bool:
-    incorrect_files = find_files_with_incorrect_jira_reference_in_todo(files)
 
-    if incorrect_files:
+    if (incorrect_files := find_files_with_incorrect_jira_reference_in_todo(files)):
         print("\nThe following TODOs do not correspond to the JIRA-Ticket TODO format 'TODO(ABC-1234):':")
         for file in incorrect_files:
             print(f"{file['file_path']}:{file['line_number']}: error: '{file['line_content']}'")
