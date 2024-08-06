@@ -1,4 +1,6 @@
 default_stages: [commit]
+default_language_version:
+  python: python3.8
 
 ci:
   autoupdate_commit_msg: 'chore(deps): pre-commit.ci autoupdate'
