@@ -95,15 +95,15 @@ Check for non existing and duplicate paths in `.pre-commit-config.yaml`. Backgro
 
 Check if all folders in the `CODEOWNERS` file exist, there are no duplicates, and it has acceptable codeowners.
 
-What is an acceptable codeowner? We want to make sure that every folder has a codeowner other than the wildcard `*`.
-For this, we define a define a `CODEOWNERS_OWNER` using the `--codeowners-owner` argument. Your `CODEOWNERS` file should look as follows:
+What is an acceptable codeowner? We want to make sure that every folder has a codeowner other than the team that should exclusively own the CODEOWNERS file.
+For this, we define a `CODEOWNERS_OWNER` using the `--codeowners-owner` argument. Your `CODEOWNERS` file should look as follows:
 
 ```shell
 * CODEOWNERS_OWNER
 
 # Here goes all your CODEOWNERS file content overriding the wildcard owner
 
-# leave this at the bottom
+# leave this at the bottom to have highest ownership priority
 /.github/CODEOWNERS CODEOWNERS_OWNER
 ```
 
