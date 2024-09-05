@@ -60,3 +60,24 @@
   entry: check-useless-exclude-paths-hooks
   language: python
   additional_dependencies: ["pre-commit >= 3.5.0"]
+- id: check-ownership
+  name: Check `.github/CODEOWNERS` consistency (can take a while)
+  description: |
+    Check if all folders in the `CODEOWNERS` file exist, there are no duplicates, and it has acceptable codeowners.
+
+    What is an acceptable codeowner? We want to make sure that every folder has a codeowner other than the team that should exclusively own the CODEOWNERS file.
+    For this, we define a `CODEOWNERS_OWNER` using the `--codeowners-owner` argument. Your `CODEOWNERS` file should look as follows:
+
+    ```shell
+    * CODEOWNERS_OWNER
+
+    # Here goes all your CODEOWNERS file content overriding the wildcard owner
+
+    # leave this at the bottom to have highest ownership priority
+    /.github/CODEOWNERS CODEOWNERS_OWNER
+    ```
+
+    If the hook detects `CODEOWNERS_OWNER` owns anything else than `.github/CODEOWNERS` it will fail to make sure every file added has an acceptable codeowner.
+  entry: check-ownership
+  language: python
+  always_run: true
