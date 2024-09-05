@@ -53,7 +53,7 @@ whoowns path/to/your/file/or/folder
 # path/to/your/file/or/folder -> @owner1
 ```
 
-Specify the `--level N` to see the owners of `N` child directories.
+Specify the `--level N` to see the owners of child items in the N-th directory level below your provided folder.
 
 ## Hooks
 
