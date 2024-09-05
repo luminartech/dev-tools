@@ -10,6 +10,7 @@ These tools are used to help developers in their day-to-day tasks.
 
 - [Tools](#tools)
   - [Configure VS Code for Bazel](#configure-vs-code-for-bazel)
+  - [Whoowns](#whoowns)
 - [Hooks](#hooks)
   - [`check-build-file-without-extensions`](#check-build-file-without-extensions)
   - [`check-snake-case`](#check-snake-case)
@@ -19,6 +20,7 @@ These tools are used to help developers in their day-to-day tasks.
   - [`check-shellscript-set-options`](#check-shellscript-set-options)
   - [`check-jira-reference-in-todo`](#check-jira-reference-in-todo)
   - [`check-non-existing-and-duplicate-excludes`](#check-non-existing-and-duplicate-excludes)
+  - [`check-ownership`](#check-ownership)
 - [Contributing](#contributing)
 
 <!-- mdformat-toc end -->
@@ -37,6 +39,21 @@ configure-vscode-for-bazel //path/to/your/target/...
 
 This will be forwarded to a `bazel query` listing all `cc_binary` and `cc_test` targets.
 Make sure you compile with debug symbols (`--compilation_mode=dbg`) enabled.
+
+### Whoowns
+
+`whoowns` is a tool to print the GitHub codeowner of a folder or file by parsing the `.github/CODEOWNERS` file.
+With this tool, you can easily find out who is responsible for a specific part of the codebase from the terminal.
+To find the owners of a file or folder, run
+
+```shell
+whoowns path/to/your/file/or/folder
+
+# example output
+# path/to/your/file/or/folder -> @owner1
+```
+
+Specify the `--level N` to see the owners of `N` child directories.
 
 ## Hooks
 
@@ -73,6 +90,24 @@ Check that all TODO comments follow the same pattern and link a Jira ticket: `TO
 ### `check-non-existing-and-duplicate-excludes`
 
 Check for non existing and duplicate paths in `.pre-commit-config.yaml`. Background: In a big codebase, the exclude lists can be quite long and it's easy to make a typo or forget to remove an entry when it's no longer needed.
+
+### `check-ownership`
+
+Check if all folders in the `CODEOWNERS` file exist, there are no duplicates, and it has acceptable codeowners.
+
+What is an acceptable codeowner? We want to make sure that every folder has a codeowner other than the wildcard `*`.
+For this, we define a define a `CODEOWNERS_OWNER` using the `--codeowners-owner` argument. Your `CODEOWNERS` file should look as follows:
+
+```shell
+* CODEOWNERS_OWNER
+
+# Here goes all your CODEOWNERS file content overriding the wildcard owner
+
+# leave this at the bottom
+/.github/CODEOWNERS CODEOWNERS_OWNER
+```
+
+If the hook detects `CODEOWNERS_OWNER` owns anything else than `.github/CODEOWNERS` it will fail to make sure every file added has an acceptable codeowner.
 
 <!-- hooks-doc end -->
 
