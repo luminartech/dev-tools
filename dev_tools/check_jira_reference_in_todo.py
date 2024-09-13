@@ -12,7 +12,7 @@ from dev_tools.git_hook_utils import parse_arguments
 def line_has_incorrect_todo(line: str) -> bool:
     return (
         not re.compile(r"^.*(?=TODO\([A-Z]+\-[0-9]+\)\:).*").search(line)
-        if re.compile(r"^.*(?=(?i:to-?do)|TO DO)(?!todo|toDouble|tOdometry)").search(line)
+        if re.compile(r"^.*(?=(?i:to-?do)|TO DO)(?!todo\w+|toDouble|tOdometry)").search(line)
         else False
     )
 

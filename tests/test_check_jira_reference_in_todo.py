@@ -18,14 +18,14 @@ def test_line_has_incorrect_todo_for_no_incorrect_todo(content: str) -> None:
     assert not line_has_incorrect_todo(content)
 
 
-@pytest.mark.parametrize("content", ["todo", "toDouble()", "setOdometry()", "getOdometry"])
+@pytest.mark.parametrize("content", ["toDouble()", "setOdometry()", "getOdometry"])
 def test_line_has_incorrect_todo_for_no_undetected_todo(content: str) -> None:
     assert not line_has_incorrect_todo(content)
 
 
 @pytest.mark.parametrize(
     "content",
-    ["TODO(ABC-1234)", "TODO ABC-1234:", "TODO (ABC-1234):", "ToDo ABC:", "Todo(ABC-1234):", "To-Do(ABC-1234):"],
+    ["todo ", "TODO(ABC-1234)", "TODO ABC-1234:", "TODO (ABC-1234):", "ToDo ABC:", "Todo(ABC-1234):", "To-Do(ABC-1234):"],
 )
 def test_line_has_incorrect_todo_for_incorrect_todo(content: str) -> None:
     assert line_has_incorrect_todo(content)
