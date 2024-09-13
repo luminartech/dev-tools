@@ -18,7 +18,7 @@ def test_line_has_incorrect_todo_for_no_incorrect_todo(content: str) -> None:
     assert not line_has_incorrect_todo(content)
 
 
-@pytest.mark.parametrize("content", ["todoom", "toDouble()", "setOdometry()", "getOdometry"])
+@pytest.mark.parametrize("content", ["todoom", "todo-color", "toDouble()", "setOdometry()", "getOdometry"])
 def test_line_has_incorrect_todo_for_no_undetected_todo(content: str) -> None:
     assert not line_has_incorrect_todo(content)
 
