@@ -32,6 +32,12 @@
   files: "-"
   types_or:
     - markdown
+- id: check-sys-path-append
+  name: Check sys path append usage
+  description: Check that no sys.path.append is used for Python code
+  entry: "sys.path.append"
+  language: pygrep
+  types: ["python"]
 - id: check-number-of-lines-count
   name: Check Number of Lines
   description: Check that number of lines in scripts do not exceed max-lines. Use `--max-lines=<number>` to set the maximum number of lines. Default is 30 for shell scripts.
