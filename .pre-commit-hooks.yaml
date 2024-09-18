@@ -34,7 +34,7 @@
     - markdown
 - id: check-sys-path-append
   name: Check sys path append usage
-  description: Check that no sys.path.append is used for Python code
+  description: Check that no `sys.path.append` is used in Python code
   entry: "sys.path.append"
   language: pygrep
   types: ["python"]

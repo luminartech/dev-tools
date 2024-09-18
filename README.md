@@ -78,7 +78,7 @@ Check that markdown filenames do not use dashes
 
 ### `check-sys-path-append`
 
-Check that no sys.path.append is used for Python code
+Check that no `sys.path.append` is used in Python code
 
 ### `check-number-of-lines-count`
 
