@@ -1,7 +1,16 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:best-practices",
-    "schedule:monthly"
-  ]
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:best-practices",
+        "schedule:monthly"
+    ],
+    "packageRules": [
+        {
+            "matchManagers": [
+                "poetry",
+                "pip_requirements"
+            ],
+            "groupName": "{{packageFileDir}} dependency updates"
+        }
+    ]
 }
