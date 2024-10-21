@@ -127,20 +127,19 @@ def check_if_codeowners_has_ineffective_rules(all_entries: List[OwnerShipEntry])
     return return_code
 
 
-def get_codeowners_path(repo_dir: Path) -> Path:
+def get_default_codeowners_path(repo_dir: Path) -> Path:
     return repo_dir / ".github" / "CODEOWNERS"
 
 
-def perform_all_codeowners_checks(repo_dir: Path) -> ReturnCode:
-    codeowners = get_codeowners_path(repo_dir)
+def perform_all_codeowners_checks(repo_dir: Path, codeowners_file: Path) -> ReturnCode:
     return_code = ReturnCode.SUCCESS
-    all_entries = list(get_ownership_entries(codeowners))
+    all_entries = list(get_ownership_entries(codeowners_file))
 
     return_code |= check_if_all_codeowners_folders_exist(repo_dir, all_entries)
     return_code |= check_if_codeowners_has_ineffective_rules(all_entries)
 
     if return_code != ReturnCode.SUCCESS:
-        print(f"Errors found in file {codeowners}")
+        print(f"Errors found in file {codeowners_file}")
 
     return return_code
 
@@ -155,22 +154,21 @@ def get_git_tracked_files(folder: Path) -> List[Path]:
 
 
 def check_for_files_without_team_ownership(
-    repo_dir: Path, changed_files: List[Path], codeowners_owner: Optional[str]
+    repo_dir: Path, changed_files: List[Path], codeowners_owner: Optional[str], codeowners_file: Path
 ) -> ReturnCode:
     """The codeowners_owner should own ONLY the CODEOWNERS file."""
     if codeowners_owner is None:
         print("No codeowners-owner provided. Skipping check.")
         return ReturnCode.SUCCESS
 
-    codeowners = get_codeowners_path(repo_dir)
     changed_files = [file.resolve() for file in changed_files]
-    files_to_check = get_git_tracked_files(repo_dir) if codeowners in changed_files else changed_files
-    ownership_service = GithubOwnerShip(repo_dir)
+    files_to_check = get_git_tracked_files(repo_dir) if codeowners_file in changed_files else changed_files
+    ownership_service = GithubOwnerShip(repo_dir, codeowners_file)
     files_owned_by_codeowners_file_owners = [
-        file for file in files_to_check if file != codeowners and ownership_service.is_owned_by(file, codeowners_owner)
+        file for file in files_to_check if file != codeowners_file and ownership_service.is_owned_by(file, codeowners_owner)
     ]
     print(f"files to check: {files_to_check}")
-    print(f"codeowners: {codeowners}")
+    print(f"codeowners_file: {codeowners_file}")
     print(f"changed_files: {changed_files}")
     if not files_owned_by_codeowners_file_owners:
         return ReturnCode.SUCCESS
@@ -184,14 +182,15 @@ def check_for_files_without_team_ownership(
 def parse_arguments() -> Namespace:
     parser = create_default_parser()
     parser.add_argument("--codeowners-owner", type=str, help="Team or person that should only own the CODEOWNERS file")
+    parser.add_argument("--codeowners-file", type=Path, help="Path to the CODEOWNERS file", default=get_default_codeowners_path(Path.cwd()))
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_arguments()
     repo_root = Path.cwd()
-    return perform_all_codeowners_checks(repo_root) | check_for_files_without_team_ownership(
-        repo_root, args.filenames, args.codeowners_owner
+    return perform_all_codeowners_checks(repo_root, args.codeowners_file) | check_for_files_without_team_ownership(
+        repo_root, args.filenames, args.codeowners_owner, args.codeowners_file
     )
 
 

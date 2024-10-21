@@ -140,7 +140,7 @@ def test_check_for_files_without_team_ownership__only_codeowners_owned_by_codeow
     fs.create_file(foo_file)
 
     assert (
-        check_for_files_without_team_ownership(repo_dir, [codeowners, foo_file], "@myorg/codeowners-owner")
+        check_for_files_without_team_ownership(repo_dir, [codeowners, foo_file], "@myorg/codeowners-owner", codeowners)
         == ReturnCode.SUCCESS
     )
 
@@ -154,17 +154,21 @@ def test_check_for_files_without_team_ownership__no_codeowners_owner_provided__s
     fs.create_file(codeowners)
     fs.create_file(foo_file)
 
-    assert check_for_files_without_team_ownership(repo_dir, [codeowners, foo_file], None) == ReturnCode.SUCCESS
+    assert check_for_files_without_team_ownership(repo_dir, [codeowners, foo_file], None, codeowners) == ReturnCode.SUCCESS
 
 
+@pytest.mark.parametrize(
+    "codeowners_file",
+    [Path("/test_repo") / ".github" / "CODEOWNERS", Path("/test_repo") / "CODEOWNERS"],
+)
 def test_check_for_files_without_team_ownership__file_owned_by_codeowners_owner__should_fail_with_error_file_without_team_ownership(
-    fs: FakeFilesystem, repo_dir: Path, codeowners: Path, monkeypatch: pytest.MonkeyPatch
+    fs: FakeFilesystem, repo_dir: Path, monkeypatch: pytest.MonkeyPatch, codeowners_file: Path
 ) -> None:
     foo_file = repo_dir / ".github" / "foo"
-    monkeypatch.setattr("dev_tools.check_ownership.get_git_tracked_files", lambda _: [codeowners, foo_file])
+    monkeypatch.setattr("dev_tools.check_ownership.get_git_tracked_files", lambda _: [codeowners_file, foo_file])
 
     fs.create_file(
-        codeowners,
+        codeowners_file,
         contents="""
 * @myorg/codeowners-owner
 """,
@@ -172,10 +176,9 @@ def test_check_for_files_without_team_ownership__file_owned_by_codeowners_owner_
     fs.create_file(foo_file)
 
     assert (
-        check_for_files_without_team_ownership(repo_dir, [codeowners, foo_file], "@myorg/codeowners-owner")
+        check_for_files_without_team_ownership(repo_dir, [codeowners_file, foo_file], "@myorg/codeowners-owner", codeowners_file)
         == ReturnCode.ERROR_FILE_WITHOUT_TEAM_OWNERSHIP
     )
-
 
 def test_check_for_files_without_team_ownership__codeowners_changes_but_not_the_file__should_fail_with_error_file_without_team_ownership(
     fs: FakeFilesystem, repo_dir: Path, codeowners: Path, monkeypatch: pytest.MonkeyPatch
@@ -190,7 +193,7 @@ def test_check_for_files_without_team_ownership__codeowners_changes_but_not_the_
     )
     fs.create_file(foo_file)
     assert (
-        check_for_files_without_team_ownership(repo_dir, [codeowners], "@myorg/codeowners-owner")
+        check_for_files_without_team_ownership(repo_dir, [codeowners], "@myorg/codeowners-owner", codeowners)
         == ReturnCode.ERROR_FILE_WITHOUT_TEAM_OWNERSHIP
     )
 
@@ -216,7 +219,7 @@ def test__perform_all_codeowners_checks__for_valid_file__should_pass(
     )
     fs.create_file(repo_dir / file_path)
 
-    assert perform_all_codeowners_checks(repo_dir) == ReturnCode.SUCCESS
+    assert perform_all_codeowners_checks(repo_dir, codeowners) == ReturnCode.SUCCESS
 
 
 def test__perform_all_codeowners_checks__for_single_problem__should_fail_with_error_folder_doenst_exist(
@@ -230,17 +233,21 @@ def test__perform_all_codeowners_checks__for_single_problem__should_fail_with_er
     )
     fs.create_file(repo_dir / "src/test_a.c")
 
-    return_code = perform_all_codeowners_checks(repo_dir)
+    return_code = perform_all_codeowners_checks(repo_dir, codeowners)
     assert return_code != ReturnCode.ERROR_MULTIPLE_FOLDER_OWNERS
     assert return_code != ReturnCode.ERROR_RULE_IS_INEFFECTIVE
     assert return_code == ReturnCode.ERROR_FOLDER_DOESNT_EXIST
 
 
+@pytest.mark.parametrize(
+    "codeowners_file",
+    [Path("/test_repo") / ".github" / "CODEOWNERS", Path("/test_repo") / "CODEOWNERS"],
+)
 def test__perform_all_codeowners_checks__for_multiple_problems__should_fail_with_combined_error(
-    fs: FakeFilesystem, repo_dir: Path, codeowners: Path
+    fs: FakeFilesystem, repo_dir: Path, codeowners_file: Path
 ) -> None:
     fs.create_file(
-        codeowners,
+        codeowners_file,
         contents="""
 /.gitlab-ci.yml @myorg/bar
 /.gitlab-ci.yml @myorg/anotherteam
@@ -248,7 +255,7 @@ def test__perform_all_codeowners_checks__for_multiple_problems__should_fail_with
         """,
     )
 
-    return_code = perform_all_codeowners_checks(repo_dir)
+    return_code = perform_all_codeowners_checks(repo_dir, codeowners_file)
     assert (
         return_code
         == ReturnCode.ERROR_MULTIPLE_FOLDER_OWNERS

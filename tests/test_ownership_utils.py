@@ -17,7 +17,7 @@ def _create_repo_path_with_codeowners_file(fs: FakeFilesystem, codeowners_conten
 
 def testis_file_covered_by_pattern__matches_file(fs: FakeFilesystem) -> None:
     repo_dir = _create_repo_path_with_codeowners_file(fs)
-    unit = GithubOwnerShip(repo_dir)
+    unit = GithubOwnerShip(repo_dir, repo_dir / ".github" / "CODEOWNERS")
 
     assert unit.is_file_covered_by_pattern(Path("foo") / "bar" / "file.py", "file.py")
     assert unit.is_file_covered_by_pattern(Path("foo") / "bar" / "file.py", "foo/bar")
@@ -27,7 +27,7 @@ def testis_file_covered_by_pattern__matches_file(fs: FakeFilesystem) -> None:
 
 def testis_file_covered_by_pattern__does_not_match_file(fs: FakeFilesystem) -> None:
     repo_dir = _create_repo_path_with_codeowners_file(fs)
-    unit = GithubOwnerShip(repo_dir)
+    unit = GithubOwnerShip(repo_dir, repo_dir / ".github" / "CODEOWNERS")
 
     assert not unit.is_file_covered_by_pattern(Path("foo") / "bar" / "src" / "CMakeLists.txt", "file.py")
     assert not unit.is_file_covered_by_pattern(Path("foo") / "bar" / "file.py", "/file.py")
@@ -37,7 +37,7 @@ def testis_file_covered_by_pattern__does_not_match_file(fs: FakeFilesystem) -> N
 
 def testis_file_covered_by_pattern__wildcard_pattern_matches_file(fs: FakeFilesystem) -> None:
     repo_dir = _create_repo_path_with_codeowners_file(fs)
-    unit = GithubOwnerShip(repo_dir)
+    unit = GithubOwnerShip(repo_dir, repo_dir / ".github" / "CODEOWNERS")
 
     assert unit.is_file_covered_by_pattern(Path("src") / "team_a_setup" / "install.py", "/src/team_a_*")
     assert unit.is_file_covered_by_pattern(
@@ -53,7 +53,10 @@ def testis_file_covered_by_pattern__wildcard_pattern_matches_file(fs: FakeFilesy
 
 def testis_file_covered_by_pattern__match_leading_and_trailing_os_separator(fs: FakeFilesystem) -> None:
     repo_dir = _create_repo_path_with_codeowners_file(fs)
-    unit = GithubOwnerShip(repo_dir)
+    codeowners = repo_dir / "CODEOWNERS"
+    fs.create_file(        codeowners
+    )
+    unit = GithubOwnerShip(repo_dir, codeowners)
 
     assert unit.is_file_covered_by_pattern(Path("src") / "team_a_setup" / "install.py", "/src/team_a_setup/install.py")
     assert unit.is_file_covered_by_pattern(Path("src") / "team_a_setup" / "install.py", "src/team_a_setup/install.py")
@@ -63,7 +66,7 @@ def testis_file_covered_by_pattern__match_leading_and_trailing_os_separator(fs: 
 
 def testis_file_covered_by_pattern__wildcard_pattern_does_not_match_file(fs: FakeFilesystem) -> None:
     repo_dir = _create_repo_path_with_codeowners_file(fs)
-    unit = GithubOwnerShip(repo_dir)
+    unit = GithubOwnerShip(repo_dir, repo_dir / ".github" / "CODEOWNERS")
 
     assert not unit.is_file_covered_by_pattern(Path("src") / "team_b_setup" / "install.py", "/src/team_a_*")
     assert not unit.is_file_covered_by_pattern(
@@ -79,7 +82,7 @@ def testis_file_covered_by_pattern__wildcard_pattern_does_not_match_file(fs: Fak
 
 def testis_file_covered_by_pattern__wildcard_for_non_recursive_ownership(fs: FakeFilesystem) -> None:
     repo_dir = _create_repo_path_with_codeowners_file(fs)
-    unit = GithubOwnerShip(repo_dir)
+    unit = GithubOwnerShip(repo_dir, repo_dir / ".github" / "CODEOWNERS")
 
     assert unit.is_file_covered_by_pattern(Path("src") / "README.md", "src/*")
     assert unit.is_file_covered_by_pattern(Path("src") / "README.md", "/src/*")
@@ -97,7 +100,7 @@ def testis_file_covered_by_pattern__wildcard_for_non_recursive_ownership(fs: Fak
 
 def testis_file_covered_by_pattern__almighty_wildcard(fs: FakeFilesystem) -> None:
     repo_dir = _create_repo_path_with_codeowners_file(fs)
-    unit = GithubOwnerShip(repo_dir)
+    unit = GithubOwnerShip(repo_dir, repo_dir / ".github" / "CODEOWNERS")
 
     assert unit.is_file_covered_by_pattern(Path("CONTRIBUTING.md"), "*")
     assert unit.is_file_covered_by_pattern(Path("src") / "README.md", "*")
@@ -106,7 +109,7 @@ def testis_file_covered_by_pattern__almighty_wildcard(fs: FakeFilesystem) -> Non
 
 def testis_file_covered_by_pattern__full_path_matches(fs: FakeFilesystem) -> None:
     repo_dir = _create_repo_path_with_codeowners_file(fs)
-    unit = GithubOwnerShip(repo_dir)
+    unit = GithubOwnerShip(repo_dir, repo_dir / ".github" / "CODEOWNERS")
 
     assert unit.is_file_covered_by_pattern(Path("foo/bar"), "/foo/bar")
     assert not unit.is_file_covered_by_pattern(Path("foo/other"), "/foo/bar")
@@ -118,7 +121,7 @@ def test_github_ownership_is_file_owned_by(fs: FakeFilesystem) -> None:
         codeowners_content="""/foo.txt devs
 /docs/ devs management""",
     )
-    unit = GithubOwnerShip(repo_dir)
+    unit = GithubOwnerShip(repo_dir, repo_dir / ".github" / "CODEOWNERS")
     assert unit.is_owned_by(repo_dir / "foo.txt", "devs")
     assert not unit.is_owned_by(repo_dir / "foo.txt", "management")
     assert unit.is_owned_by(repo_dir / "docs", "devs")
@@ -131,7 +134,7 @@ def test_github_ownership_get_owners(fs: FakeFilesystem) -> None:
         codeowners_content="""/src/ devs
 /docs/ devs management""",
     )
-    unit = GithubOwnerShip(repo_dir)
+    unit = GithubOwnerShip(repo_dir, repo_dir / ".github" / "CODEOWNERS")
     assert unit.get_owners(repo_dir / "src") == ("devs",)
     assert unit.get_owners(repo_dir / "docs") == ("devs", "management")
     assert unit.get_owners(repo_dir / "scripts") == ()
@@ -148,7 +151,7 @@ def test_github_ownership_get_owners__second_overwrites_first__should_be_differe
         codeowners_content="""/foo/bar bar-owner
 /foo/bar/package package-owner""",
     )
-    unit = GithubOwnerShip(repo_dir)
+    unit = GithubOwnerShip(repo_dir, repo_dir / ".github" / "CODEOWNERS")
     assert unit.get_owners(repo_dir / "foo" / "bar") == ("bar-owner",)
     assert unit.get_owners(repo_dir / "foo" / "bar" / "package") == ("package-owner",)
     assert unit.get_owners(repo_dir / "foo" / "bar" / "something_else") == ("bar-owner",)

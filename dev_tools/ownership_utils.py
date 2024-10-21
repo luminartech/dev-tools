@@ -16,8 +16,8 @@ class OwnerShipEntry:
 
 
 class GithubOwnerShip:
-    def __init__(self, repo_dir: Path) -> None:
-        self._ownerships = parse_ownership(repo_dir / ".github" / "CODEOWNERS")
+    def __init__(self, repo_dir: Path, codeowners_file: Path) -> None:
+        self._ownerships = parse_ownership(codeowners_file)
         self._repo_dir = repo_dir
         self._cached_regex = CachedRegex()
 
