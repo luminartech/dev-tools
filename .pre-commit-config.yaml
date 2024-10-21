@@ -1,6 +1,4 @@
 default_stages: [commit]
-default_language_version:
-  python: python3.8
 
 ci:
   autoupdate_commit_msg: 'chore(deps): pre-commit.ci autoupdate'
@@ -148,7 +146,8 @@ repos:
     hooks:
       - id: markdownlint
         args: ["--dot", "--fix"]
-  - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 38.77.3
-    hooks:
-      - id: renovate-config-validator
+# Enable once https://github.com/renovatebot/pre-commit-hooks/issues/2460 is resolved
+#   - repo: https://github.com/renovatebot/pre-commit-hooks
+#     rev: 38.77.3
+#     hooks:
+#       - id: renovate-config-validator
