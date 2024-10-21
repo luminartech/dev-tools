@@ -45,7 +45,7 @@ repos:
         args: [--branch, master]
       - id: trailing-whitespace
   - repo: https://github.com/mattlqx/pre-commit-search-and-replace
-    rev: v1.1.5
+    rev: v1.1.4
     hooks:
       - id: search-and-replace
   - repo: https://github.com/astral-sh/ruff-pre-commit
