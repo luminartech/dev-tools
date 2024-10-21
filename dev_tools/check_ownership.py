@@ -165,7 +165,9 @@ def check_for_files_without_team_ownership(
     files_to_check = get_git_tracked_files(repo_dir) if codeowners_file in changed_files else changed_files
     ownership_service = GithubOwnerShip(repo_dir, codeowners_file)
     files_owned_by_codeowners_file_owners = [
-        file for file in files_to_check if file != codeowners_file and ownership_service.is_owned_by(file, codeowners_owner)
+        file
+        for file in files_to_check
+        if file != codeowners_file and ownership_service.is_owned_by(file, codeowners_owner)
     ]
     print(f"files to check: {files_to_check}")
     print(f"codeowners_file: {codeowners_file}")
@@ -182,7 +184,12 @@ def check_for_files_without_team_ownership(
 def parse_arguments() -> Namespace:
     parser = create_default_parser()
     parser.add_argument("--codeowners-owner", type=str, help="Team or person that should only own the CODEOWNERS file")
-    parser.add_argument("--codeowners-file", type=Path, help="Path to the CODEOWNERS file", default=get_default_codeowners_path(Path.cwd()))
+    parser.add_argument(
+        "--codeowners-file",
+        type=Path,
+        help="Path to the CODEOWNERS file",
+        default=get_default_codeowners_path(Path.cwd()),
+    )
     return parser.parse_args()
 
 

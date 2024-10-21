@@ -54,8 +54,7 @@ def testis_file_covered_by_pattern__wildcard_pattern_matches_file(fs: FakeFilesy
 def testis_file_covered_by_pattern__match_leading_and_trailing_os_separator(fs: FakeFilesystem) -> None:
     repo_dir = _create_repo_path_with_codeowners_file(fs)
     codeowners = repo_dir / "CODEOWNERS"
-    fs.create_file(        codeowners
-    )
+    fs.create_file(codeowners)
     unit = GithubOwnerShip(repo_dir, codeowners)
 
     assert unit.is_file_covered_by_pattern(Path("src") / "team_a_setup" / "install.py", "/src/team_a_setup/install.py")

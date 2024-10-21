@@ -154,7 +154,9 @@ def test_check_for_files_without_team_ownership__no_codeowners_owner_provided__s
     fs.create_file(codeowners)
     fs.create_file(foo_file)
 
-    assert check_for_files_without_team_ownership(repo_dir, [codeowners, foo_file], None, codeowners) == ReturnCode.SUCCESS
+    assert (
+        check_for_files_without_team_ownership(repo_dir, [codeowners, foo_file], None, codeowners) == ReturnCode.SUCCESS
+    )
 
 
 @pytest.mark.parametrize(
@@ -176,9 +178,12 @@ def test_check_for_files_without_team_ownership__file_owned_by_codeowners_owner_
     fs.create_file(foo_file)
 
     assert (
-        check_for_files_without_team_ownership(repo_dir, [codeowners_file, foo_file], "@myorg/codeowners-owner", codeowners_file)
+        check_for_files_without_team_ownership(
+            repo_dir, [codeowners_file, foo_file], "@myorg/codeowners-owner", codeowners_file
+        )
         == ReturnCode.ERROR_FILE_WITHOUT_TEAM_OWNERSHIP
     )
+
 
 def test_check_for_files_without_team_ownership__codeowners_changes_but_not_the_file__should_fail_with_error_file_without_team_ownership(
     fs: FakeFilesystem, repo_dir: Path, codeowners: Path, monkeypatch: pytest.MonkeyPatch
