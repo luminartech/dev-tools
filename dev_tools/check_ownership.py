@@ -190,7 +190,12 @@ def parse_arguments() -> Namespace:
         help="Path to the CODEOWNERS file",
         default=get_default_codeowners_path(Path.cwd()),
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    if not args.codeowners_file.is_file():
+        parser.error(
+            f"CODEOWNERS file '{args.codeowners_file}' not found. Consider specifying --codeowners-file in the command line."
+        )
+    return args
 
 
 def main() -> int:
