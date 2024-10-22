@@ -181,21 +181,22 @@ def check_for_files_without_team_ownership(
     return ReturnCode.ERROR_FILE_WITHOUT_TEAM_OWNERSHIP
 
 
+def file_path(path_string: str) -> Path:
+    if Path(path_string).is_file():
+        return Path(path_string)
+    raise ValueError(path_string)
+
+
 def parse_arguments() -> Namespace:
     parser = create_default_parser()
     parser.add_argument("--codeowners-owner", type=str, help="Team or person that should only own the CODEOWNERS file")
     parser.add_argument(
         "--codeowners-file",
-        type=Path,
+        type=file_path,
         help="Path to the CODEOWNERS file",
         default=get_default_codeowners_path(Path.cwd()),
     )
-    args = parser.parse_args()
-    if not args.codeowners_file.is_file():
-        parser.error(
-            f"CODEOWNERS file '{args.codeowners_file}' not found. Consider specifying --codeowners-file in the command line."
-        )
-    return args
+    return parser.parse_args()
 
 
 def main() -> int:
