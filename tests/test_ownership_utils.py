@@ -171,3 +171,22 @@ def test_get_ownership_entries_should_be_parsed_correctly(fs: FakeFilesystem) ->
     assert len(result) == expect_entries_found
     assert result[0].owners == ("devs",)
     assert result[1].owners == ("devs", "management")
+
+
+def test_get_owners__for_relative_codeowners__finds_it(fs: FakeFilesystem) -> None:
+    codeowners = Path("/repo/CODEOWNERS")
+    repo_dir = Path("/repo/subfolder")
+    codeowners_relative = Path("../CODEOWNERS")
+
+    fs.create_file(codeowners, contents="""/src/ devs""")
+    unit = GithubOwnerShip(repo_dir, codeowners_relative)
+    assert unit.get_owners(repo_dir / "src") == ("devs",)
+
+
+def test_get_owners__for_absolute_codeowners__finds_it(fs: FakeFilesystem) -> None:
+    codeowners = Path("/repo/CODEOWNERS")
+    repo_dir = Path("/repo/subfolder")
+
+    fs.create_file(codeowners, contents="""/src/ devs""")
+    unit = GithubOwnerShip(repo_dir, codeowners)
+    assert unit.get_owners(repo_dir / "src") == ("devs",)

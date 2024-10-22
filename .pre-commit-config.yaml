@@ -53,8 +53,6 @@ repos:
     hooks:
       - id: ruff-format
       - id: ruff
-        args:
-          - --extend-ignore=ISC001
 
   - repo: https://github.com/python-poetry/poetry
     rev: 1.8.4
