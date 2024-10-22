@@ -52,7 +52,7 @@ def get_owners(item: Path, level: int) -> Dict[str, Tuple[str, ...]]:
 
     repo_dir = Path(check_git("rev-parse --show-toplevel", repo_dir=item.parent if item.is_file() else item).rstrip())
     items = get_subitems(item, level)
-    ownership = GithubOwnerShip(repo_dir)
+    ownership = GithubOwnerShip(repo_dir, repo_dir / ".github" / "CODEOWNERS")
     return {str(item.relative_to(repo_dir)): ownership.get_owners(item) for item in items}
 
 
