@@ -1,6 +1,4 @@
 default_stages: [commit]
-default_language_version:
-  python: python3.8
 
 ci:
   autoupdate_commit_msg: 'chore(deps): pre-commit.ci autoupdate'
@@ -25,7 +23,7 @@ repos:
         additional_dependencies:
           - pre-commit>=3.5.0
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
         args: [--maxkb=1024]
@@ -47,16 +45,16 @@ repos:
         args: [--branch, master]
       - id: trailing-whitespace
   - repo: https://github.com/mattlqx/pre-commit-search-and-replace
-    rev: v1.1.3
+    rev: v1.1.4
     hooks:
       - id: search-and-replace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.3
+    rev: v0.7.0
     hooks:
       - id: ruff-format
       - id: ruff
   - repo: https://github.com/python-poetry/poetry
-    rev: 1.8.3
+    rev: 1.8.4
     hooks:
       - id: poetry-check
       - id: poetry-lock
@@ -97,7 +95,7 @@ repos:
       - id: yamllint
         args: [--strict]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+    rev: v1.12.1
     hooks:
       - id: mypy
   - repo: https://github.com/asottile/pyupgrade
@@ -106,29 +104,29 @@ repos:
       - id: pyupgrade
         args: [--py38-plus]
   - repo: https://github.com/PyCQA/docformatter
-    rev: v1.7.5
+    rev: eb1df347edd128b30cd3368dddc3aa65edcfac38 # Requires >v1.7.5
     hooks:
       - id: docformatter
         args: [--in-place, --config, pyproject.toml]
         additional_dependencies: [tomli==2.0.1]
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.29.2
+    rev: 0.29.4
     hooks:
       - id: check-github-workflows
       - id: check-renovate
   - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
-    rev: v1.7.1.15
+    rev: v1.7.3.17
     hooks:
       - id: actionlint
         additional_dependencies: [pyflakes>=3.1.0, shellcheck-py>=0.9.0.5]
   - repo: https://github.com/crate-ci/typos
-    rev: typos-dict-v0.11.27
+    rev: v1.26.0
     hooks:
       - id: typos
         exclude_types:
           - svg
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.17
+    rev: 0.7.17 # Last version to support Python 3.8
     hooks:
       - id: mdformat
         additional_dependencies:
@@ -139,16 +137,17 @@ repos:
           - mdformat-config==0.1.3
           - mdformat-toc==0.3.0
   - repo: https://github.com/asottile/blacken-docs
-    rev: 1.18.0
+    rev: 1.18.0 # Last version to support Python 3.8
     hooks:
       - id: blacken-docs
         args: [--line-length=120]
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.41.0
+    rev: v0.42.0
     hooks:
       - id: markdownlint
         args: ["--dot", "--fix"]
-  - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 38.77.3
-    hooks:
-      - id: renovate-config-validator
+# Enable once https://github.com/renovatebot/pre-commit-hooks/issues/2460 is resolved
+#   - repo: https://github.com/renovatebot/pre-commit-hooks
+#     rev: 38.77.3
+#     hooks:
+#       - id: renovate-config-validator
