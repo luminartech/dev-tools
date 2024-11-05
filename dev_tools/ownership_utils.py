@@ -34,18 +34,12 @@ def is_relative_to(subpath: PurePath, root: PurePath) -> bool:
         return True
 
 
-def assert_file_exists(file: Path) -> None:
-    if not file.is_file():
-        message = f"file {file} does not exist"
-        raise FileNotFoundError(message)
-
-
 def resolve_file_in_dir(dir: Path, file: Path) -> Path:
     """Return a path to `file` assuming it's in `dir` directory or its subdirs.
 
     `file` can be both relative to `dir` or absolute.
     `dir` can be both relative to current working dir or absolute.
-    Raise an exception if `file` is not in `dir` or `file` does not exist.
+    Raise an exception if `file` is not in `dir`.
     """
     print(f"dir: {dir}, file: {file}, file.is_absolute(): {file.is_absolute()}")
     if file.is_absolute():
@@ -56,7 +50,6 @@ def resolve_file_in_dir(dir: Path, file: Path) -> Path:
     else:
         resolved_file = (dir / file).resolve()
     print(f"resolved_file: {resolved_file}")
-    assert_file_exists(resolved_file)
     return resolved_file
 
 
