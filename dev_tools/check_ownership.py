@@ -184,14 +184,16 @@ def check_for_files_without_team_ownership(
 def parse_arguments() -> Namespace:
     parser = create_default_parser()
     parser.add_argument("--codeowners-owner", type=str, help="Team or person that should only own the CODEOWNERS file")
+    parser.add_argument(
+        "--repo-dir", type=Path, help="Path to the git repo that should be checked.", default=Path.cwd()
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_arguments()
-    repo_root = Path.cwd()
-    return perform_all_codeowners_checks(repo_root) | check_for_files_without_team_ownership(
-        repo_root, args.filenames, args.codeowners_owner
+    return perform_all_codeowners_checks(args.repo_dir) | check_for_files_without_team_ownership(
+        args.repo_dir, args.filenames, args.codeowners_owner
     )
 
 
