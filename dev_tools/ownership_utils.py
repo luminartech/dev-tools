@@ -4,8 +4,16 @@
 import re
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Dict, Generator, Optional, Tuple
+
+
+class FileNotFoundError(Exception):
+    pass
+
+
+class NotInDirectoryError(Exception):
+    pass
 
 
 class OwnerShipEntry:
@@ -15,13 +23,47 @@ class OwnerShipEntry:
         self.line_number: int = line_number
 
 
+# This is only defined in pathlib in Python 3.9.
+def is_relative_to(subpath: PurePath, root: PurePath) -> bool:
+    """Return True if subpath is relative to root or False."""
+    try:
+        subpath.relative_to(root)
+    except ValueError:
+        return False
+    else:
+        return True
+
+
+def assert_file_exists(file: Path) -> None:
+    if not file.is_file():
+        message = f"file {file} does not exist"
+        raise FileNotFoundError(message)
+
+
+def resolve_file_in_dir(dir: Path, file: Path) -> Path:
+    """Return a path to `file` assuming it's in `dir` directory or its subdirs.
+
+    `file` can be both relative to `dir` or absolute.
+    `dir` can be both relative to current working dir or absolute.
+    Raise an exception if `file` is not in `dir` or `file` does not exist.
+    """
+    print(f"dir: {dir}, file: {file}, file.is_absolute(): {file.is_absolute()}")
+    if file.is_absolute():
+        resolved_file = file.resolve()
+        if not is_relative_to(resolved_file, dir.resolve()):
+            message = f"file {resolved_file} is not in directory {dir.resolve()}"
+            raise NotInDirectoryError(message)
+    else:
+        resolved_file = (dir / file).resolve()
+    print(f"resolved_file: {resolved_file}")
+    assert_file_exists(resolved_file)
+    return resolved_file
+
+
 class GithubOwnerShip:
     def __init__(self, repo_dir: Path, codeowners_file: Path = Path(".github") / "CODEOWNERS") -> None:
-        codeowners_resolved_path = (
-            codeowners_file if codeowners_file.is_absolute() else (repo_dir / codeowners_file).resolve()
-        )
-        self._ownerships = parse_ownership(codeowners_resolved_path)
-        self._repo_dir = repo_dir
+        self._ownerships = parse_ownership(resolve_file_in_dir(repo_dir, codeowners_file))
+        self._repo_dir = repo_dir.resolve()
         self._cached_regex = CachedRegex()
 
     def is_owned_by(self, file: Path, codeowner: str) -> bool:

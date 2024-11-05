@@ -12,3 +12,10 @@ Then simply run
 poetry install  # to setup your virtual environment with all dependencies
 poetry run pytest  # to run all unit tests
 ```
+
+### Testing the hooks on another repo
+
+```shell
+poetry run <hook_name> <hook_args>
+# Eg. poetry run check-ownership --codeowners-owner your_github_user --repo-dir ../other-repo/
+```

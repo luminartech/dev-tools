@@ -8,7 +8,17 @@ from pathlib import Path
 from typing import Dict, Generator, Iterable, Iterator, List, Optional, Set
 
 from dev_tools.git_hook_utils import create_default_parser
-from dev_tools.ownership_utils import GithubOwnerShip, OwnerShipEntry, check_git, get_ownership_entries
+from dev_tools.ownership_utils import (
+    GithubOwnerShip,
+    OwnerShipEntry,
+    check_git,
+    get_ownership_entries,
+    resolve_file_in_dir,
+)
+
+
+class DirNotFoundError(Exception):
+    pass
 
 
 class ReturnCode(IntFlag):
@@ -127,8 +137,8 @@ def check_if_codeowners_has_ineffective_rules(all_entries: List[OwnerShipEntry])
     return return_code
 
 
-def get_default_codeowners_path(repo_dir: Path) -> Path:
-    return repo_dir / ".github" / "CODEOWNERS"
+def get_default_codeowners_path() -> Path:
+    return Path(".github", "CODEOWNERS")
 
 
 def perform_all_codeowners_checks(repo_dir: Path, codeowners_file: Path) -> ReturnCode:
@@ -181,10 +191,11 @@ def check_for_files_without_team_ownership(
     return ReturnCode.ERROR_FILE_WITHOUT_TEAM_OWNERSHIP
 
 
-def file_path(path_string: str) -> Path:
-    if Path(path_string).is_file():
+def dir_path(path_string: str) -> Path:
+    if Path(path_string).is_dir():
         return Path(path_string)
-    raise ValueError(path_string)
+    message = f"{path_string} is not a directory"
+    raise DirNotFoundError(message)
 
 
 def parse_arguments() -> Namespace:
@@ -192,18 +203,19 @@ def parse_arguments() -> Namespace:
     parser.add_argument("--codeowners-owner", type=str, help="Team or person that should only own the CODEOWNERS file")
     parser.add_argument(
         "--codeowners-file",
-        type=file_path,
-        help="Path to the CODEOWNERS file",
-        default=get_default_codeowners_path(Path.cwd()),
+        type=Path,
+        help="Path to the CODEOWNERS file. Must be inside repo defined by --repo-dir.",
+        default=get_default_codeowners_path(),
     )
+    parser.add_argument("--repo-dir", type=dir_path, help="Path to the git repo that should be checked.")
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_arguments()
-    repo_root = Path.cwd()
-    return perform_all_codeowners_checks(repo_root, args.codeowners_file) | check_for_files_without_team_ownership(
-        repo_root, args.filenames, args.codeowners_owner, args.codeowners_file
+    args.codeowners_file = resolve_file_in_dir(args.repo_dir, args.codeowners_file)
+    return perform_all_codeowners_checks(args.repo_dir, args.codeowners_file) | check_for_files_without_team_ownership(
+        args.repo_dir, args.filenames, args.codeowners_owner, args.codeowners_file
     )
 
 
