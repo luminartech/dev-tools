@@ -85,10 +85,10 @@ repos:
     hooks:
       - id: toml-sort-fix
         exclude: "\\.lock$"
-  # - repo: https://github.com/google/yamlfmt
-  #   rev: v0.14.0
-  #   hooks:
-  #     - id: yamlfmt
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.14.0
+    hooks:
+      - id: yamlfmt
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.35.1
     hooks:
