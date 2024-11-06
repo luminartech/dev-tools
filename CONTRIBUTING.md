@@ -12,3 +12,13 @@ Then simply run
 poetry install  # to setup your virtual environment with all dependencies
 poetry run pytest  # to run all unit tests
 ```
+
+To run a development version of a script for testing eg. a hook on another repo, run:
+
+```shell
+poetry install # to install current poetry scripts in a virtualenv
+poetry shell # to activate the virtualenv
+# And then eg.
+cd <another_repo>
+check-ownership file1 file2
+```
