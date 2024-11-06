@@ -22,3 +22,11 @@ poetry shell # to activate the virtualenv
 cd <another_repo>
 check-ownership file1 file2
 ```
+
+An alternative to the above is to run:
+
+```shell
+pip3 install -e .
+```
+
+That will install the tools in editable mode, meaning that your code changes will be visible as soon as you run the scripts again.
