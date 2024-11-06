@@ -35,11 +35,6 @@ def parse_arguments(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         action="store_true",
         help="Don't ask for confirmation.",
     )
-    parser.add_argument(
-        "--bazel-workspace",
-        type=Path,
-        help="Path to the Bazel workspace. By default, it's determined by running `bazel info workspace`.",
-    )
 
     return parser.parse_args(argv)
 
@@ -60,10 +55,10 @@ def confirm_if_too_many_labels(labels: Set[str], force: bool) -> None:  # noqa: 
         confirm_or_abort()
 
 
-def query_bazel_for_labels(pattern: str, *, workspace_dir: Optional[Path] = None) -> str:
+def query_bazel_for_labels(pattern: str) -> str:
     cmd = ["bazel", "query", f"'{pattern}'", "--output=label_kind"]
     logging.info("Running command: %s", " ".join(cmd))
-    return subprocess.check_output(cmd, cwd=workspace_dir).decode(sys.stdout.encoding)
+    return subprocess.check_output(cmd).decode(sys.stdout.encoding)
 
 
 def get_label_from_bazel_query_line(line: str) -> Optional[str]:
@@ -87,11 +82,10 @@ def quit_if_no_labels_found(all_labels: set) -> None:
         sys.exit(1)
 
 
-def find_executable_labels(patterns: Sequence[str], force: bool, *, workspace_dir: Optional[Path] = None) -> Set[str]:  # noqa: FBT001
+def find_executable_labels(patterns: Sequence[str], force: bool) -> Set[str]:  # noqa: FBT001
     logging.info("Searching for executable targets to generate launch.json...")
     labels_nested = (
-        get_labels_from_bazel_query_output(query_bazel_for_labels(pattern, workspace_dir=workspace_dir), pattern)
-        for pattern in patterns
+        get_labels_from_bazel_query_output(query_bazel_for_labels(pattern), pattern) for pattern in patterns
     )
     labels = {label for labels in labels_nested for label in labels}
 
@@ -163,14 +157,8 @@ def print_build_reminder(bazel_patterns: List[str]) -> None:
     )
 
 
-def update_launch_json(
-    bazel_patterns: List[str],
-    config_location: Path,
-    force: bool,  # noqa: FBT001
-    *,
-    workspace_dir: Optional[Path] = None,
-) -> None:
-    executable_labels = find_executable_labels(bazel_patterns, force, workspace_dir=workspace_dir)
+def update_launch_json(bazel_patterns: List[str], config_location: Path, force: bool) -> None:  # noqa: FBT001
+    executable_labels = find_executable_labels(bazel_patterns, force)
     new_config = get_new_config(executable_labels)
     save_new_config(new_config, config_location, force)
 
@@ -190,11 +178,7 @@ def main() -> int:
         logging.warning("Bazel is required! Please install Bazel first.")
         return 1
 
-    bazel_workspace = args.bazel_workspace if args.bazel_workspace else get_workspace_root()
-
-    update_launch_json(
-        args.bazel_pattern, bazel_workspace / ".vscode" / "launch.json", args.force, workspace_dir=bazel_workspace
-    )
+    update_launch_json(args.bazel_pattern, get_workspace_root() / ".vscode" / "launch.json", args.force)
 
     logging.info("You can now run the debug target(s) in VS Code.")
     print_build_reminder(args.bazel_pattern)
