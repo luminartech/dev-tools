@@ -113,7 +113,7 @@ def get_new_config(executable_labels: Set[str]) -> Dict[str, Any]:
                 "name": f"(gdb) {label}",
                 "type": "cppdbg",
                 "request": "launch",
-                "program": r"${workspaceFolder}/bazel-out/k8-dbg/bin/${binary_path}.runfiles/_main/${binary_path}",
+                "program": r"${workspaceFolder}/bazel-out/k8-dbg/bin/${binary_path}",
                 "args": [],
                 "stopAtEntry": False,
                 "cwd": r"${workspaceFolder}",

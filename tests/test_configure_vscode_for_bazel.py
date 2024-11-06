@@ -65,6 +65,7 @@ def test__get_new_config__for_one_label__returns_correct_variables() -> None:
     assert config["configurations"][0]["name"] == "(gdb) //foo/bar:test1"
     assert config["configurations"][0]["cwd"] == "${workspaceFolder}"
     assert config["configurations"][0]["variables"]["generated_by"] == "configure-vscode-for-bazel"
+    assert config["configurations"][0]["program"].endswith(r"bazel-out/k8-dbg/bin/${binary_path}")
 
 
 def test__save_new_config__when_it_doesnt_exist__creates_new_file(fs: FakeFilesystem) -> None:
