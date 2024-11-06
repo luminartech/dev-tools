@@ -12,3 +12,21 @@ Then simply run
 poetry install  # to setup your virtual environment with all dependencies
 poetry run pytest  # to run all unit tests
 ```
+
+To run a development version of a script for testing eg. a hook on another repo, run:
+
+```shell
+poetry install # to install current poetry scripts in a virtualenv
+poetry shell # to activate the virtualenv
+# And then eg.
+cd <another_repo>
+check-ownership file1 file2
+```
+
+An alternative to the above is to run:
+
+```shell
+pip3 install -e .
+```
+
+That will install the tools in editable mode, meaning that your code changes will be visible as soon as you run the scripts again.
