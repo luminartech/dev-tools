@@ -1,7 +1,7 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
-from pathlib import Path, PurePath
+from pathlib import Path
 
 import pytest
 from pyfakefs.fake_filesystem import FakeFilesystem
@@ -173,23 +173,23 @@ def test_get_ownership_entries_should_be_parsed_correctly(fs: FakeFilesystem) ->
 
 
 def test_is_file_covered_by_pattern__exact_entries__returns_true() -> None:
-    path = PurePath("a/b/c")
-    prefix = PurePath("a/b/c")
+    path = "a/b/c"
+    prefix = "a/b/c"
 
     assert GithubOwnerShip.is_path_prefix(path, prefix)
 
 
 @pytest.mark.parametrize("prefix", ["a/b", "a"])
 def test_is_file_covered_by_pattern__proper_prefix__returns_true(prefix: str) -> None:
-    path = PurePath("a/b/c")
-    prefix_path = PurePath(prefix)
+    path = "a/b/c"
+    prefix_path = prefix
 
     assert GithubOwnerShip.is_path_prefix(path, prefix_path)
 
 
 @pytest.mark.parametrize("prefix", ["aa", "a/bc"])
 def test_is_file_covered_by_pattern__not_a_prefix__returns_false(prefix: str) -> None:
-    path = PurePath("a/b/c")
-    prefix_path = PurePath(prefix)
+    path = "a/b/c"
+    prefix_path = prefix
 
     assert not GithubOwnerShip.is_path_prefix(path, prefix_path)

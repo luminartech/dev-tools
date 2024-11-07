@@ -4,7 +4,7 @@
 import re
 import subprocess
 import sys
-from pathlib import Path, PurePath
+from pathlib import Path
 from typing import Dict, Generator, Optional, Tuple
 
 
@@ -36,15 +36,14 @@ class GithubOwnerShip:
         return ()
 
     @staticmethod
-    def is_path_prefix(path: PurePath, prefix: PurePath) -> bool:
+    def is_path_prefix(path: str, prefix: str) -> bool:
         """Check if `prefix` is one of the parents of `path`, including itself."""
-        path_str, prefix_str = str(path), str(prefix)
-        if not path_str.startswith(prefix_str):
+        if not path.startswith(prefix):
             return False
-        path_length, prefix_length = len(path_str), len(prefix_str)
+        path_length, prefix_length = len(path), len(prefix)
         if path_length == prefix_length:
             return True
-        return path_str[prefix_length] == "/"
+        return path[prefix_length] == "/"
 
     def is_file_covered_by_pattern(self, filepath_in_repo: Path, pattern: str) -> bool:
         """Implements the complete featureset demonstrated at https://docs.github.com/en/repositories/managing-your-
@@ -53,8 +52,7 @@ class GithubOwnerShip:
         if "*" in pattern:
             return self._match_pattern_with_asterisks(filepath_string, filepath_in_repo.name, pattern)
         if pattern.startswith("/"):
-            pattern_path = Path(pattern[1:].rstrip("/"))
-            return GithubOwnerShip.is_path_prefix(path=filepath_in_repo, prefix=pattern_path)
+            return GithubOwnerShip.is_path_prefix(path=filepath_string, prefix=pattern[1:].rstrip("/"))
         return pattern.rstrip("/") in filepath_string
 
     def _match_pattern_with_asterisks(self, filepath_string: str, filename: str, pattern: str) -> bool:
