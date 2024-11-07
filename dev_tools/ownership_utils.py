@@ -41,8 +41,8 @@ class GithubOwnerShip:
         """Check if `prefix` is one of the parents of `path`, including itself."""
         if not path.startswith(prefix):
             return False
-        path_length, prefix_length = len(path), len(prefix)
-        if path_length == prefix_length:
+        prefix_length = len(prefix)
+        if len(path) == prefix_length:
             return True
         return path[prefix_length] == "/"
 
