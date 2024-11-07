@@ -29,8 +29,9 @@ class GithubOwnerShip:
         return owners[0] if owners else None
 
     def get_owners(self, file: Path) -> Tuple[str, ...]:
+        file_relative = file.relative_to(self._repo_dir)
         for ownership in self._ownerships:
-            if self.is_file_covered_by_pattern(file.relative_to(self._repo_dir), ownership.pattern):
+            if self.is_file_covered_by_pattern(file_relative, ownership.pattern):
                 return ownership.owners
 
         return ()
