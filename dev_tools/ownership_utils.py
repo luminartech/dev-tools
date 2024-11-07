@@ -4,7 +4,7 @@
 import re
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Dict, Generator, Optional, Tuple
 
 
@@ -36,7 +36,7 @@ class GithubOwnerShip:
         return ()
 
     @staticmethod
-    def is_path_prefix(path: Path, prefix: Path) -> bool:
+    def is_path_prefix(path: PurePath, prefix: PurePath) -> bool:
         """Check if `prefix` is one of the parents of `path`, including itself."""
         path_str, prefix_str = str(path), str(prefix)
         if not path_str.startswith(prefix_str):
