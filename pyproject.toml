@@ -31,7 +31,7 @@ warn_unused_ignores = true
 
 [tool.poetry]
 name = "dev-tools"
-version = "0.4.0"
+version = "0.5.0"
 description = ""
 authors = ["BRE <bre@luminartech.com>"]
 readme = "README.md"
