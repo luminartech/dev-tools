@@ -29,11 +29,22 @@ class GithubOwnerShip:
         return owners[0] if owners else None
 
     def get_owners(self, file: Path) -> Tuple[str, ...]:
+        file_relative = file.relative_to(self._repo_dir)
         for ownership in self._ownerships:
-            if self.is_file_covered_by_pattern(file.relative_to(self._repo_dir), ownership.pattern):
+            if self.is_file_covered_by_pattern(file_relative, ownership.pattern):
                 return ownership.owners
 
         return ()
+
+    @staticmethod
+    def is_path_prefix(path: str, prefix: str) -> bool:
+        """Check if `prefix` is one of the parents of `path`, including itself."""
+        if not path.startswith(prefix):
+            return False
+        prefix_length = len(prefix)
+        if len(path) == prefix_length:
+            return True
+        return path[prefix_length] == "/"
 
     def is_file_covered_by_pattern(self, filepath_in_repo: Path, pattern: str) -> bool:
         """Implements the complete featureset demonstrated at https://docs.github.com/en/repositories/managing-your-
@@ -42,8 +53,7 @@ class GithubOwnerShip:
         if "*" in pattern:
             return self._match_pattern_with_asterisks(filepath_string, filepath_in_repo.name, pattern)
         if pattern.startswith("/"):
-            path_from_pattern = Path(pattern[1:].rstrip("/"))
-            return path_from_pattern == filepath_in_repo or path_from_pattern in filepath_in_repo.parents
+            return GithubOwnerShip.is_path_prefix(path=filepath_string, prefix=pattern[1:].rstrip("/"))
         return pattern.rstrip("/") in filepath_string
 
     def _match_pattern_with_asterisks(self, filepath_string: str, filename: str, pattern: str) -> bool:
