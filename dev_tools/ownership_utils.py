@@ -35,6 +35,17 @@ class GithubOwnerShip:
 
         return ()
 
+    @staticmethod
+    def is_path_prefix(path: Path, prefix: Path) -> bool:
+        """Check if `prefix` is one of the parents of `path`, including itself."""
+        path_str, prefix_str = str(path), str(prefix)
+        if not path_str.startswith(prefix_str):
+            return False
+        path_length, prefix_length = len(path_str), len(prefix_str)
+        if path_length == prefix_length:
+            return True
+        return path_str[prefix_length] == "/"
+
     def is_file_covered_by_pattern(self, filepath_in_repo: Path, pattern: str) -> bool:
         """Implements the complete featureset demonstrated at https://docs.github.com/en/repositories/managing-your-
         repositorys-settings-and-features/customizing-your-repository/about-code-owners#example-of-a-codeowners-file."""
@@ -42,8 +53,8 @@ class GithubOwnerShip:
         if "*" in pattern:
             return self._match_pattern_with_asterisks(filepath_string, filepath_in_repo.name, pattern)
         if pattern.startswith("/"):
-            path_from_pattern = Path(pattern[1:].rstrip("/"))
-            return path_from_pattern == filepath_in_repo or path_from_pattern in filepath_in_repo.parents
+            pattern_path = Path(pattern[1:].rstrip("/"))
+            return GithubOwnerShip.is_path_prefix(path=filepath_in_repo, prefix=pattern_path)
         return pattern.rstrip("/") in filepath_string
 
     def _match_pattern_with_asterisks(self, filepath_string: str, filename: str, pattern: str) -> bool:
