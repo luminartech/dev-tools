@@ -141,11 +141,22 @@ repos:
     hooks:
       - id: blacken-docs
         args: [--line-length=120]
+  - repo: https://github.com/tcort/markdown-link-check
+    # Stick to 3.11.2 until https://github.com/tcort/markdown-link-check/issues/325 is fixed
+    rev: v3.11.2
+    hooks:
+      - id: markdown-link-check
+        args: ["--quiet", "--config", ".md-link-config.json"]
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.42.0
     hooks:
       - id: markdownlint
         args: ["--dot", "--fix"]
+  - repo: https://github.com/jendrikseipp/vulture
+    rev: v2.13
+    hooks:
+      - id: vulture
+        pass_filenames: true
 # Enable once https://github.com/renovatebot/pre-commit-hooks/issues/2460 is resolved
 #   - repo: https://github.com/renovatebot/pre-commit-hooks
 #     rev: 38.77.3

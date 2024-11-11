@@ -1,0 +1,21 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^https://"
+    },
+    {
+      "pattern": "^http://"
+    },
+    {
+      "pattern": "^mailto:"
+    }
+  ],
+  "timeout": "200ms",
+  "retryOn429": true,
+  "retryCount": 1,
+  "fallbackRetryDelay": "200ms",
+  "aliveStatusCodes": [
+    200,
+    206
+  ]
+}
