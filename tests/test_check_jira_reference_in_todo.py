@@ -12,9 +12,11 @@ from dev_tools.check_jira_reference_in_todo import (
     line_has_incorrect_todo,
 )
 
+
 @pytest.mark.parametrize("content", ["TODO(ABC-1234):", "# TODO(ABC-1234):", "TODO(ABC-1234): remove code"])
 def test_line_has_incorrect_todo_for_correct_todo(content: str) -> None:
     assert not line_has_incorrect_todo(content)
+
 
 @pytest.mark.parametrize(
     "content",
@@ -31,6 +33,7 @@ def test_line_has_incorrect_todo_for_correct_todo(content: str) -> None:
 )
 def test_line_has_incorrect_todo_for_incorrect_todo(content: str) -> None:
     assert line_has_incorrect_todo(content)
+
 
 @pytest.mark.parametrize(
     "content", ["todoom", "todo-color", "toDouble()", "setOdometry()", "getOdometry", "to download", "toDog"]
