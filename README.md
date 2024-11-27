@@ -17,6 +17,9 @@ These tools are used to help developers in their day-to-day tasks.
   - [`check-cpp-and-cu-unit-test-naming-pattern`](#check-cpp-and-cu-unit-test-naming-pattern)
   - [`check-no-dashes`](#check-no-dashes)
   - [`check-sys-path-append`](#check-sys-path-append)
+  - [`go-fmt`](#go-fmt)
+  - [`go-imports`](#go-imports)
+  - [`go-revive`](#go-revive)
   - [`check-number-of-lines-count`](#check-number-of-lines-count)
   - [`check-shellscript-set-options`](#check-shellscript-set-options)
   - [`check-jira-reference-in-todo`](#check-jira-reference-in-todo)
@@ -79,6 +82,18 @@ Check that markdown filenames do not use dashes
 ### `check-sys-path-append`
 
 Check that no `sys.path.append` is used in Python code
+
+### `go-fmt`
+
+Format go files
+
+### `go-imports`
+
+Order go imports
+
+### `go-revive`
+
+Run Go Revive linter
 
 ### `check-number-of-lines-count`
 

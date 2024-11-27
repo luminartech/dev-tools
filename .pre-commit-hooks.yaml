@@ -38,6 +38,29 @@
   entry: "sys.path.append"
   language: pygrep
   types: ["python"]
+- id: go-fmt
+  name: Go Format
+  description: Format go files
+  entry: gofmt
+  args: [-s, -w, -d=false]
+  language: golang
+  types: [go]
+- id: go-imports
+  name: Go Imports
+  description: Order go imports
+  entry: goimports
+  args: [-w, -d=false]
+  additional_dependencies: [golang.org/x/tools/cmd/goimports@v0.25.0]
+  language: golang
+  types: [go]
+- id: go-revive
+  name: Go Revive
+  description: Run Go Revive linter
+  entry: revive
+  args: [-set_exit_status, -formatter, friendly]
+  additional_dependencies: [github.com/mgechev/revive@v1.3.9]
+  language: golang
+  types: [go]
 - id: check-number-of-lines-count
   name: Check Number of Lines
   description: Check that number of lines in scripts do not exceed max-lines. Use `--max-lines=<number>` to set the maximum number of lines. Default is 30 for shell scripts.
