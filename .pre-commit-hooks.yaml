@@ -50,7 +50,7 @@
   description: Order go imports
   entry: goimports
   args: [-w, -d=false]
-  additional_dependencies: [golang.org/x/tools/cmd/goimports@v0.25.0]
+  additional_dependencies: [golang.org/x/tools/cmd/goimports@v0.27.0]
   language: golang
   types: [go]
 - id: go-revive
@@ -58,7 +58,7 @@
   description: Run Go Revive linter
   entry: revive
   args: [-set_exit_status, -formatter, friendly]
-  additional_dependencies: [github.com/mgechev/revive@v1.3.9]
+  additional_dependencies: [github.com/mgechev/revive@v1.5.1]
   language: golang
   types: [go]
 - id: check-number-of-lines-count
