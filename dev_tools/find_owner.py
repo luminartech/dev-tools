@@ -5,10 +5,11 @@
 Can also find owners of children, if a level is given.
 """
 
+from __future__ import annotations
+
 import argparse
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 from dev_tools.ownership_utils import GithubOwnerShip, check_git
 
@@ -38,14 +39,14 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def get_subitems(item: Path, level: int) -> List[Path]:
+def get_subitems(item: Path, level: int) -> list[Path]:
     if level == 0:
         return [item.resolve()]
     pattern = "/".join(["*"] * level)
     return sorted(item.resolve() for item in item.glob(pattern))
 
 
-def get_owners(item: Path, level: int) -> Dict[str, Tuple[str, ...]]:
+def get_owners(item: Path, level: int) -> dict[str, tuple[str, ...]]:
     if not item.exists():
         msg = f"Item {item} does not exist. Please provide a valid path to an existing file or folder as item."
         raise FileNotFoundError(msg)
@@ -56,7 +57,7 @@ def get_owners(item: Path, level: int) -> Dict[str, Tuple[str, ...]]:
     return {str(item.relative_to(repo_dir)): ownership.get_owners(item) for item in items}
 
 
-def print_owners(owners: Dict[str, Tuple[str, ...]]) -> None:
+def print_owners(owners: dict[str, tuple[str, ...]]) -> None:
     max_path_length = max(len(item) for item in owners)
     for item, owner in owners.items():
         print(f'{item:{max_path_length}} -> {", ".join(owner)}')

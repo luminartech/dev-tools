@@ -1,9 +1,14 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
-from pyfakefs.fake_filesystem import FakeFilesystem
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from dev_tools.check_shellscript_set_options import main
+
+if TYPE_CHECKING:
+    from pyfakefs.fake_filesystem import FakeFilesystem
 
 
 def test_pass_for_valid_file(fs: FakeFilesystem) -> None:

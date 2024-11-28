@@ -1,11 +1,15 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
-from pathlib import Path
+from __future__ import annotations
 
-from pyfakefs.fake_filesystem import FakeFilesystem
+from pathlib import Path
+from typing import TYPE_CHECKING
 
 from dev_tools.local.generate_hook_docs import generate_hooks_documentation, update_hooks_documentation_in_readme
+
+if TYPE_CHECKING:
+    from pyfakefs.fake_filesystem import FakeFilesystem
 
 
 def test_generate_hooks_documentation__no_hooks__should_be_empty_string() -> None:

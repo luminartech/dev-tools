@@ -1,12 +1,17 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from pyfakefs.fake_filesystem import FakeFilesystem
 
 from dev_tools.ownership_utils import GithubOwnerShip, get_ownership_entries
+
+if TYPE_CHECKING:
+    from pyfakefs.fake_filesystem import FakeFilesystem
 
 
 def _create_repo_path_with_codeowners_file(fs: FakeFilesystem, codeowners_content: str = "") -> Path:

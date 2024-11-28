@@ -1,14 +1,18 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
 import sys
-from argparse import Namespace
 from enum import IntFlag, auto
 from pathlib import Path
-from typing import Dict, Generator, Iterable, Iterator, List, Optional, Set
+from typing import TYPE_CHECKING, Generator, Iterable, Iterator
 
 from dev_tools.git_hook_utils import create_default_parser
 from dev_tools.ownership_utils import GithubOwnerShip, OwnerShipEntry, check_git, get_ownership_entries
+
+if TYPE_CHECKING:
+    from argparse import Namespace
 
 
 class ReturnCode(IntFlag):
@@ -49,11 +53,11 @@ class OwnerShipTreeNode:
     """Represents a node in filesystem tree."""
 
     def __init__(self) -> None:
-        self.children: Dict[str, OwnerShipTreeNode] = {}
-        self.owners: Set[str] = set()
-        self.line_number: Optional[int] = None
+        self.children: dict[str, OwnerShipTreeNode] = {}
+        self.owners: set[str] = set()
+        self.line_number: int | None = None
 
-    def add_or_return_child(self, child_name: str) -> "OwnerShipTreeNode":
+    def add_or_return_child(self, child_name: str) -> OwnerShipTreeNode:
         if child_name not in self.children:
             node = OwnerShipTreeNode()
             self.children[child_name] = node
@@ -61,7 +65,7 @@ class OwnerShipTreeNode:
         return self.children[child_name]
 
 
-def check_if_codeowners_has_ineffective_rules(all_entries: List[OwnerShipEntry]) -> ReturnCode:
+def check_if_codeowners_has_ineffective_rules(all_entries: list[OwnerShipEntry]) -> ReturnCode:
     def _populate_tree(entry: OwnerShipEntry, path_parts: Iterator[str], tree_node: OwnerShipTreeNode) -> ReturnCode:
         """Add an OwnerShipEntry to the tree representation of all ownership entries.
 
@@ -94,7 +98,7 @@ def check_if_codeowners_has_ineffective_rules(all_entries: List[OwnerShipEntry])
         return return_code
 
     def _find_ineffective_rules(
-        tree_node: OwnerShipTreeNode, first_ancestor: Optional[OwnerShipTreeNode], current_path: Path
+        tree_node: OwnerShipTreeNode, first_ancestor: OwnerShipTreeNode | None, current_path: Path
     ) -> ReturnCode:
         """Search the ownership tree for rules which are fully contained in another
         rule. They are ineffective (redundant).
@@ -149,13 +153,13 @@ def is_empty(iterable: Generator[Path, None, None]) -> bool:
     return next(iterable, None) is None
 
 
-def get_git_tracked_files(folder: Path) -> List[Path]:
+def get_git_tracked_files(folder: Path) -> list[Path]:
     files = check_git(f"ls-files {folder.relative_to(folder)}", folder)
     return [folder / file for file in files.splitlines()]
 
 
 def check_for_files_without_team_ownership(
-    repo_dir: Path, changed_files: List[Path], codeowners_owner: Optional[str]
+    repo_dir: Path, changed_files: list[Path], codeowners_owner: str | None
 ) -> ReturnCode:
     """The codeowners_owner should own ONLY the CODEOWNERS file."""
     if codeowners_owner is None:

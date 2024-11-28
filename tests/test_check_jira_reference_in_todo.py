@@ -1,16 +1,21 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from pyfakefs.fake_filesystem import FakeFilesystem
 
 from dev_tools.check_jira_reference_in_todo import (
     find_files_with_incorrect_jira_reference_in_todo,
     has_any_file_incorrect_jira_reference_in_todo,
     line_has_incorrect_todo,
 )
+
+if TYPE_CHECKING:
+    from pyfakefs.fake_filesystem import FakeFilesystem
 
 
 @pytest.mark.parametrize("content", ["TODO(ABC-1234):", "# TODO(ABC-1234):", "TODO(ABC-1234): remove code"])

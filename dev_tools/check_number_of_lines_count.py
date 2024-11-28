@@ -1,14 +1,18 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
-import argparse
+from __future__ import annotations
+
 import sys
-from typing import Optional, Sequence
+from typing import TYPE_CHECKING, Sequence
 
 from dev_tools.git_hook_utils import create_default_parser
 
+if TYPE_CHECKING:
+    import argparse
 
-def parse_arguments(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
+
+def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = create_default_parser()
     parser.add_argument(
         "--max-lines",
@@ -20,7 +24,7 @@ def parse_arguments(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     args = parse_arguments(argv)
 
     are_all_files_ok = True
