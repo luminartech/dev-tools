@@ -1,11 +1,15 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
 import sys
-from pathlib import Path
-from typing import Optional, Sequence
+from typing import TYPE_CHECKING, Sequence
 
 from dev_tools.git_hook_utils import parse_arguments
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _sets_options_or_is_nolint(line: str) -> bool:
@@ -16,7 +20,7 @@ def _is_valid_bash_file(filename: Path) -> bool:
     return any(_sets_options_or_is_nolint(line) for line in filename.open().readlines())
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     args = parse_arguments(argv)
 
     invalid_bash_files = [filename for filename in args.filenames if not _is_valid_bash_file(filename)]

@@ -1,11 +1,13 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
 import itertools
 import sys
 from collections import Counter
 from pathlib import Path
-from typing import Any, Dict, List, Tuple, Type
+from typing import Any
 
 from pre_commit.clientlib import load_config
 
@@ -13,12 +15,12 @@ PRE_COMMIT_CONFIG_YAML = ".pre-commit-config.yaml"
 
 
 class Hook:
-    def __init__(self, id: str, exclude_paths: List[Path]) -> None:
+    def __init__(self, id: str, exclude_paths: list[Path]) -> None:
         self.__id = id
         self.__exclude_paths = exclude_paths
 
     @classmethod
-    def from_hook_config(cls: Type["Hook"], root_directory: Path, hook_config: Dict[str, str]) -> "Hook":
+    def from_hook_config(cls: type[Hook], root_directory: Path, hook_config: dict[str, str]) -> Hook:
         exclude_list = (
             hook_config["exclude"]
             .replace("\n", "")
@@ -40,15 +42,15 @@ class Hook:
         return self.__id
 
     @property
-    def exclude_paths(self) -> List[Path]:
+    def exclude_paths(self) -> list[Path]:
         return self.__exclude_paths
 
-    def find_duplicates(self) -> List[Path]:
+    def find_duplicates(self) -> list[Path]:
         counter = Counter(self.exclude_paths)
 
         return [path for path in counter if counter[path] > 1]
 
-    def find_non_existing_paths(self) -> List[Path]:
+    def find_non_existing_paths(self) -> list[Path]:
         return [path for path in self.exclude_paths if not path.resolve().exists()]
 
     def has_duplicates(self) -> bool:
@@ -62,25 +64,25 @@ def is_regex_pattern(exclude: str) -> bool:
     return any(regex_key in exclude for regex_key in ["*", "$", "^"])
 
 
-def has_excludes(hook_config: Dict[str, str]) -> bool:
+def has_excludes(hook_config: dict[str, str]) -> bool:
     return bool(hook_config.get("exclude")) and hook_config.get("exclude") != "^$"
 
 
-def load_hooks(root_directory: Path, config_file: Path) -> List[Hook]:
+def load_hooks(root_directory: Path, config_file: Path) -> list[Hook]:
     config = load_config(config_file)
     hook_configs = itertools.chain(*[repo["hooks"] for repo in config["repos"]])
 
     return [Hook.from_hook_config(root_directory, hook) for hook in hook_configs if has_excludes(hook)]
 
 
-def have_non_existent_paths_or_duplicates(hooks_list: List[Any]) -> bool:
-    non_existing_paths: List[Tuple[str, str]] = [
+def have_non_existent_paths_or_duplicates(hooks_list: list[Any]) -> bool:
+    non_existing_paths: list[tuple[str, str]] = [
         (hook_instance.id, path)
         for hook_instance in hooks_list
         if hook_instance.has_non_existing_paths()
         for path in hook_instance.find_non_existing_paths()
     ]
-    duplicates: List[Tuple[str, str]] = [
+    duplicates: list[tuple[str, str]] = [
         (hook_instance.id, duplicate)
         for hook_instance in hooks_list
         if hook_instance.has_duplicates()

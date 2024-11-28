@@ -1,12 +1,16 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
 import re
 import sys
-from pathlib import Path
-from typing import Dict, List, Optional, Sequence
+from typing import TYPE_CHECKING, Sequence
 
 from dev_tools.git_hook_utils import parse_arguments
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def line_has_incorrect_todo(line: str) -> bool:
@@ -17,7 +21,7 @@ def line_has_incorrect_todo(line: str) -> bool:
     )
 
 
-def find_files_with_incorrect_jira_reference_in_todo(files: List[Path]) -> List[Dict[str, object]]:
+def find_files_with_incorrect_jira_reference_in_todo(files: list[Path]) -> list[dict[str, object]]:
     incorrect_files = []
     for file in files:
         lines = file.read_text(errors="ignore").splitlines()
@@ -28,7 +32,7 @@ def find_files_with_incorrect_jira_reference_in_todo(files: List[Path]) -> List[
     return incorrect_files
 
 
-def has_any_file_incorrect_jira_reference_in_todo(files: List[Path]) -> bool:
+def has_any_file_incorrect_jira_reference_in_todo(files: list[Path]) -> bool:
     if incorrect_files := find_files_with_incorrect_jira_reference_in_todo(files):
         print("\nThe following TODOs do not correspond to the JIRA-Ticket TODO format 'TODO(ABC-1234):':")
         for file in incorrect_files:
@@ -38,7 +42,7 @@ def has_any_file_incorrect_jira_reference_in_todo(files: List[Path]) -> bool:
     return False
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     return 1 if has_any_file_incorrect_jira_reference_in_todo(parse_arguments(argv).filenames) else 0
 
 

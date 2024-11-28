@@ -1,11 +1,13 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
 from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
 import pytest
-from pyfakefs.fake_filesystem import FakeFilesystem
 
 from dev_tools.configure_vscode_for_bazel import (
     find_executable_labels,
@@ -16,6 +18,9 @@ from dev_tools.configure_vscode_for_bazel import (
     quit_if_no_labels_found,
     save_new_config,
 )
+
+if TYPE_CHECKING:
+    from pyfakefs.fake_filesystem import FakeFilesystem
 
 
 @patch(

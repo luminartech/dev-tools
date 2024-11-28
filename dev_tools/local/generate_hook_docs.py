@@ -3,16 +3,17 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List
 
 from pre_commit.clientlib import load_manifest
 from pre_commit.constants import MANIFEST_FILE
 
 
-def generate_hooks_documentation(hooks: List[Dict]) -> str:
+def generate_hooks_documentation(hooks: list[dict]) -> str:
     return "\n".join([f'### `{hook["id"]}`\n\n{hook["description"]}\n' for hook in hooks])
 
 

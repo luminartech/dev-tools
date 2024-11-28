@@ -1,17 +1,21 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
 import re
 import subprocess
 import sys
-from pathlib import Path
-from typing import Dict, Generator, Optional, Tuple
+from typing import TYPE_CHECKING, Generator
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class OwnerShipEntry:
-    def __init__(self, pattern: str, owners: Tuple[str, ...], line_number: int) -> None:
+    def __init__(self, pattern: str, owners: tuple[str, ...], line_number: int) -> None:
         self.pattern: str = pattern
-        self.owners: Tuple[str, ...] = owners
+        self.owners: tuple[str, ...] = owners
         self.line_number: int = line_number
 
 
@@ -24,11 +28,11 @@ class GithubOwnerShip:
     def is_owned_by(self, file: Path, codeowner: str) -> bool:
         return codeowner in self.get_owners(file)
 
-    def get_first_owner(self, file: Path) -> Optional[str]:
+    def get_first_owner(self, file: Path) -> str | None:
         owners = self.get_owners(file)
         return owners[0] if owners else None
 
-    def get_owners(self, file: Path) -> Tuple[str, ...]:
+    def get_owners(self, file: Path) -> tuple[str, ...]:
         file_relative = file.relative_to(self._repo_dir)
         for ownership in self._ownerships:
             if self.is_file_covered_by_pattern(file_relative, ownership.pattern):
@@ -75,15 +79,15 @@ class CachedRegex:
     """
 
     def __init__(self) -> None:
-        self._cache: Dict[str, re.Pattern[str]] = {}
+        self._cache: dict[str, re.Pattern[str]] = {}
 
-    def match(self, needle: str, haystack: str, flags: int = 0) -> Optional[re.Match]:
+    def match(self, needle: str, haystack: str, flags: int = 0) -> re.Match | None:
         if needle not in self._cache:
             self._cache[needle] = re.compile(needle, flags)
         return self._cache[needle].match(haystack)
 
 
-def parse_ownership(codeowners_file: Path) -> Tuple[OwnerShipEntry, ...]:
+def parse_ownership(codeowners_file: Path) -> tuple[OwnerShipEntry, ...]:
     """Return ownership in reverse order.
 
     Order is important. Last matching pattern in CODEOWNERS takes the most

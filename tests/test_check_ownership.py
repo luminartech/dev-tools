@@ -1,10 +1,12 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from pyfakefs.fake_filesystem import FakeFilesystem
 
 from dev_tools.check_ownership import (
     ReturnCode,
@@ -14,6 +16,9 @@ from dev_tools.check_ownership import (
     perform_all_codeowners_checks,
 )
 from dev_tools.ownership_utils import OwnerShipEntry
+
+if TYPE_CHECKING:
+    from pyfakefs.fake_filesystem import FakeFilesystem
 
 
 @pytest.fixture

@@ -1,10 +1,12 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from pyfakefs.fake_filesystem import FakeFilesystem
 from ruamel.yaml import YAML
 
 from dev_tools.check_useless_exclude_paths_hooks import (
@@ -14,6 +16,9 @@ from dev_tools.check_useless_exclude_paths_hooks import (
     is_regex_pattern,
     load_hooks,
 )
+
+if TYPE_CHECKING:
+    from pyfakefs.fake_filesystem import FakeFilesystem
 
 
 @pytest.mark.parametrize("pattern", [".*\\/conanfile.py", "\\.lock$", "^samples/ros1/src/"])

@@ -1,9 +1,14 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
-from pyfakefs.fake_filesystem import FakeFilesystem
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from dev_tools.check_number_of_lines_count import main
+
+if TYPE_CHECKING:
+    from pyfakefs.fake_filesystem import FakeFilesystem
 
 LONG_FILE_CONTENTS = "foo\n" * 60
 SHORT_FILE_CONTENTS = "bar\n" * 2

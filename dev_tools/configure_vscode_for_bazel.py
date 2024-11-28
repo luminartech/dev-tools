@@ -3,6 +3,8 @@
 """Generate a VSCode's launch.json debug configurations for selected Bazel C++
 targets."""
 
+from __future__ import annotations
+
 import argparse
 import json
 import logging
@@ -10,12 +12,12 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Set
+from typing import Any, Sequence
 
 MAX_TARGETS_WITHOUT_CONFIRMATION = 20
 
 
-def parse_arguments(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
+def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "bazel_pattern",
@@ -49,7 +51,7 @@ def confirm_or_abort(message: str = "") -> None:
         sys.exit(1)
 
 
-def confirm_if_too_many_labels(labels: Set[str], force: bool) -> None:  # noqa: FBT001
+def confirm_if_too_many_labels(labels: set[str], force: bool) -> None:  # noqa: FBT001
     if len(labels) > MAX_TARGETS_WITHOUT_CONFIRMATION and not force:
         logging.warning("Found %d bazel targets. Are you sure you want to add them all to launch.json?", len(labels))
         confirm_or_abort()
@@ -61,13 +63,13 @@ def query_bazel_for_labels(pattern: str) -> str:
     return subprocess.check_output(cmd).decode(sys.stdout.encoding)
 
 
-def get_label_from_bazel_query_line(line: str) -> Optional[str]:
+def get_label_from_bazel_query_line(line: str) -> str | None:
     vals = line.split()
     kind, entity, label = vals[0], vals[1], " ".join(vals[2:])
     return label if is_executable_rule(kind, entity) else None
 
 
-def get_labels_from_bazel_query_output(output: str, pattern: str) -> Set[str]:
+def get_labels_from_bazel_query_output(output: str, pattern: str) -> set[str]:
     labels = {
         label for label in (get_label_from_bazel_query_line(line) for line in output.splitlines()) if label is not None
     }
@@ -82,7 +84,7 @@ def quit_if_no_labels_found(all_labels: set) -> None:
         sys.exit(1)
 
 
-def find_executable_labels(patterns: Sequence[str], force: bool) -> Set[str]:  # noqa: FBT001
+def find_executable_labels(patterns: Sequence[str], force: bool) -> set[str]:  # noqa: FBT001
     logging.info("Searching for executable targets to generate launch.json...")
     labels_nested = (
         get_labels_from_bazel_query_output(query_bazel_for_labels(pattern), pattern) for pattern in patterns
@@ -105,7 +107,7 @@ def get_path_from_label(bazel_label: str) -> str:
     return remove_prefix_if_present(bazel_label, "//").replace(":", "/")
 
 
-def get_new_config(executable_labels: Set[str]) -> Dict[str, Any]:
+def get_new_config(executable_labels: set[str]) -> dict[str, Any]:
     return {
         "version": "0.2.0",
         "configurations": [
@@ -138,7 +140,7 @@ def get_new_config(executable_labels: Set[str]) -> Dict[str, Any]:
     }
 
 
-def save_new_config(new_config: Dict[str, Any], config_location: Path, force: bool) -> None:  # noqa: FBT001
+def save_new_config(new_config: dict[str, Any], config_location: Path, force: bool) -> None:  # noqa: FBT001
     """Serializes the new_configuration to config_location.
 
     If the file already exists, asks for confirmation, unless force is set.
@@ -150,14 +152,14 @@ def save_new_config(new_config: Dict[str, Any], config_location: Path, force: bo
     logging.info("Saved new configuration to %s", config_location)
 
 
-def print_build_reminder(bazel_patterns: List[str]) -> None:
+def print_build_reminder(bazel_patterns: list[str]) -> None:
     infix = "eg. " if len(bazel_patterns) > 1 else ""
     logging.info(
         "Remember to build the target(s) beforehand with %s `bazel build --config=debug %s`.", infix, bazel_patterns[0]
     )
 
 
-def update_launch_json(bazel_patterns: List[str], config_location: Path, force: bool) -> None:  # noqa: FBT001
+def update_launch_json(bazel_patterns: list[str], config_location: Path, force: bool) -> None:  # noqa: FBT001
     executable_labels = find_executable_labels(bazel_patterns, force)
     new_config = get_new_config(executable_labels)
     save_new_config(new_config, config_location, force)
