@@ -24,6 +24,7 @@ def test__hook_validating_test_filenames__is_defined_for_files(cpp_tests_name_ho
     [
         "src/tests/foo_test.cpp",
         "src/tests/foo_test.cu",
+        "src/tests/local/foo_test.cpp",
         "src/tests/pythontest.py",
         "src/tests/footest.cpp.txt",
         "src/python_tests/foo.py",
