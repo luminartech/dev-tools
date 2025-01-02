@@ -26,7 +26,8 @@
     (?x)^(
       .*(?<=test)(?<!_test)\.(cpp|cu)$|
       .*_tests\.(cpp|cu)$|
-      .*/test/.*\.(cpp|cu)$
+      .*/test/.*\.(cpp|cu)$|
+      (?:(?!/tests/).)*_test\.(cpp|cu)$
     )
   types_or:
     - c++

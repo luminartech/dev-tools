@@ -36,7 +36,9 @@ def test__hook_validating_test_filenames__allows_valid_cases(cpp_tests_name_hook
     assert not re.match(deny_files_pattern, filename), "Valid test filename should not match the deny pattern"
 
 
-@pytest.mark.parametrize("filename", ["src/tests/footest.cpp", "src/tests/foo_tests.cpp", "src/test/foo_test.cpp"])
+@pytest.mark.parametrize(
+    "filename", ["src/tests/footest.cpp", "src/tests/foo_tests.cpp", "src/test/foo_test.cpp", "src/foo_test.cu"]
+)
 def test__hook_validating_test_filenames__denies_invalid_cases(cpp_tests_name_hook: dict, filename: str) -> None:
     deny_files_pattern: str = cpp_tests_name_hook["files"]
     assert re.match(deny_files_pattern, filename), "Invalid test filename should match the deny pattern"
