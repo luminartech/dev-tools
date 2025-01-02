@@ -88,7 +88,6 @@ select = ["ALL"]
 ignore = [
   "A00",
   "ANN001",
-  "ANN101",
   "COM812",
   "D",
   "E501", # Line length is the task of the formatter
