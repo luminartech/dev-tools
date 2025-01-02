@@ -20,7 +20,11 @@
   description: Check that all C++ and Cuda unit test files end with `_test.cpp` or `_test.cu`.
   entry: cpp and cu unit test files must end with _test.cpp
   language: fail
-  files: '.*(?<=test)(?<!_test)\.(cpp|cu)$'
+  files: |
+    (?x)^(
+      .*(?<=test)(?<!_test)\.(cpp|cu)$|
+      .*_tests\.(cpp|cu)$
+    )
   types_or:
     - c++
     - cuda
