@@ -54,7 +54,7 @@ repos:
       - id: ruff-format
       - id: ruff
   - repo: https://github.com/python-poetry/poetry
-    rev: 2.0.0
+    rev: 1.8.5 # Last version to support Python 3.8
     hooks:
       - id: poetry-check
       - id: poetry-lock
@@ -81,7 +81,7 @@ repos:
       - id: forbid-binary
         always_run: true
   - repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.2 # Last version to support Python 3.8
+    rev: v0.23.1 # Last version to support Python 3.8
     hooks:
       - id: toml-sort-fix
         exclude: "\\.lock$"
@@ -99,12 +99,12 @@ repos:
     hooks:
       - id: mypy
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.19.1 # Last version to support Python 3.8
+    rev: v3.10.0 # Last version to support Python 3.8
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
   - repo: https://github.com/PyCQA/docformatter
-    rev: v1.7.5 # Requires >v1.7.5
+    rev: eb1df347edd128b30cd3368dddc3aa65edcfac38 # Requires >v1.7.5
     hooks:
       - id: docformatter
         args: [--in-place, --config, pyproject.toml]
@@ -126,7 +126,7 @@ repos:
         exclude_types:
           - svg
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.21 # Last version to support Python 3.8
+    rev: 0.7.17 # Last version to support Python 3.8
     hooks:
       - id: mdformat
         additional_dependencies:
@@ -137,13 +137,13 @@ repos:
           - mdformat-config==0.1.3
           - mdformat-toc==0.3.0
   - repo: https://github.com/asottile/blacken-docs
-    rev: 1.19.1 # Last version to support Python 3.8
+    rev: 1.18.0 # Last version to support Python 3.8
     hooks:
       - id: blacken-docs
         args: [--line-length=120]
   - repo: https://github.com/tcort/markdown-link-check
     # Stick to 3.11.2 until https://github.com/tcort/markdown-link-check/issues/325 is fixed
-    rev: v3.13.6
+    rev: v3.11.2
     hooks:
       - id: markdown-link-check
         args: ["--quiet", "--config", ".md-link-config.json"]
