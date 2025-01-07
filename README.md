@@ -73,7 +73,8 @@ Check that all source code files are `snake_case`. We don't want to use `camelCa
 
 ### `check-cpp-and-cu-unit-test-naming-pattern`
 
-Check that all C++ and Cuda unit test files end with `_test.cpp` or `_test.cu`.
+Check that all C++ and Cuda unit test files end with `_test.cpp` or `_test.cu` (no `_tests`)
+and that they're under a `/tests/` folder (not `/test/`).
 
 ### `check-no-dashes`
 

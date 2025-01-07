@@ -17,10 +17,20 @@
     - shell
 - id: check-cpp-and-cu-unit-test-naming-pattern
   name: Check c++ and cu unit test naming pattern
-  description: Check that all C++ and Cuda unit test files end with `_test.cpp` or `_test.cu`.
-  entry: cpp and cu unit test files must end with _test.cpp
+  description: |-
+    Check that all C++ and Cuda unit test files end with `_test.cpp` or `_test.cu` (no `_tests`)
+    and that they're under a `/tests/` folder (not `/test/`).
+  entry: cpp and cu unit test files must conform to the naming pattern
   language: fail
-  files: '.*(?<=test)(?<!_test)\.(cpp|cu)$'
+  # The last pattern below matches any test that doesn't contain /tests/ in the path.
+  # It's a Tempered Greedy Token pattern, see https://stackoverflow.com/a/38846455
+  files: |
+    (?x)^(
+      .*(?<=test)(?<!_test)\.(cpp|cu)$|
+      .*_tests\.(cpp|cu)$|
+      .*/test/.*\.(cpp|cu)$|
+      (?:(?!/tests/).)*_test\.(cpp|cu)$
+    )
   types_or:
     - c++
     - cuda
