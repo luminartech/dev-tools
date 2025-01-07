@@ -19,7 +19,7 @@
   name: Check c++ and cu unit test naming pattern
   description: |-
     Check that all C++ and Cuda unit test files end with `_test.cpp` or `_test.cu` (no `_tests`)
-    and that they're under a /tests/ folder (not /test/).
+    and that they're under a `/tests/` folder (not `/test/`).
   entry: cpp and cu unit test files must conform to the naming pattern
   language: fail
   # The last pattern below matches any test that doesn't contain /tests/ in the path.
