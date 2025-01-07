@@ -49,12 +49,12 @@ repos:
     hooks:
       - id: search-and-replace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.1
+    rev: v0.8.6
     hooks:
       - id: ruff-format
       - id: ruff
   - repo: https://github.com/python-poetry/poetry
-    rev: 1.8.4
+    rev: 1.8.5 # Last version to support Python 3.8
     hooks:
       - id: poetry-check
       - id: poetry-lock
@@ -95,11 +95,11 @@ repos:
       - id: yamllint
         args: [--strict]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+    rev: v1.14.1
     hooks:
       - id: mypy
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.16.0 # Last version to support Python 3.8
+    rev: v3.10.0 # Last version to support Python 3.8
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -115,12 +115,12 @@ repos:
       - id: check-github-workflows
       - id: check-renovate
   - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
-    rev: v1.7.4.20
+    rev: v1.7.6.22
     hooks:
       - id: actionlint
         additional_dependencies: [pyflakes>=3.1.0, shellcheck-py>=0.9.0.5]
   - repo: https://github.com/crate-ci/typos
-    rev: typos-dict-v0.11.37
+    rev: dictgen-v0.3.1
     hooks:
       - id: typos
         exclude_types:
@@ -153,7 +153,7 @@ repos:
       - id: markdownlint
         args: ["--dot", "--fix"]
   - repo: https://github.com/jendrikseipp/vulture
-    rev: v2.13
+    rev: v2.14
     hooks:
       - id: vulture
         pass_filenames: true
