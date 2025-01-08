@@ -20,7 +20,7 @@
   description: |-
     Check that all C++ and Cuda unit test files end with `_test.cpp` or `_test.cu` (no `_tests`)
     and that they're under a `/tests/` folder (not `/test/`).
-  entry: cpp and cu unit test files must conform to the naming pattern
+  entry: C++ and Cuda unit tests must be matched by `**/tests/**/*_test.(cpp|cu)`
   language: fail
   # The last pattern below matches any test that doesn't contain /tests/ in the path.
   # It's a Tempered Greedy Token pattern, see https://stackoverflow.com/a/38846455
