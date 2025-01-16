@@ -27,22 +27,29 @@ repos:
     hooks:
       - id: check-added-large-files
         args: [--maxkb=1024]
+      - id: check-ast
       - id: check-case-conflict
       - id: check-docstring-first
       - id: check-executables-have-shebangs
+      - id: check-illegal-windows-names
+      - id: check-json
       - id: check-merge-conflict
       - id: check-shebang-scripts-are-executable
       - id: check-toml
+      - id: check-vcs-permalinks
       - id: debug-statements
       - id: destroyed-symlinks
       - id: detect-private-key
       - id: end-of-file-fixer
+      - id: fix-byte-order-marker
       - id: mixed-line-ending
         args: [--fix=lf]
       - id: name-tests-test
         args: [--pytest-test-first]
       - id: no-commit-to-branch
         args: [--branch, master]
+      - id: pretty-format-json
+        args: [--autofix]
       - id: trailing-whitespace
   - repo: https://github.com/mattlqx/pre-commit-search-and-replace
     rev: v1.1.8
@@ -65,6 +72,7 @@ repos:
       - id: python-check-blanket-type-ignore
       - id: python-check-mock-methods
       - id: python-no-eval
+      - id: python-no-log-warn
       - id: python-use-type-annotations
       - id: text-unicode-replacement-char
   - repo: https://github.com/PyCQA/autoflake

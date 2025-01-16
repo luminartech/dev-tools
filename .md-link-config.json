@@ -1,4 +1,9 @@
 {
+  "aliveStatusCodes": [
+    200,
+    206
+  ],
+  "fallbackRetryDelay": "200ms",
   "ignorePatterns": [
     {
       "pattern": "^https://"
@@ -10,12 +15,7 @@
       "pattern": "^mailto:"
     }
   ],
-  "timeout": "200ms",
-  "retryOn429": true,
   "retryCount": 1,
-  "fallbackRetryDelay": "200ms",
-  "aliveStatusCodes": [
-    200,
-    206
-  ]
+  "retryOn429": true,
+  "timeout": "200ms"
 }
