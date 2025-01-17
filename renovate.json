@@ -2,14 +2,28 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:best-practices",
-    "schedule:monthly"
+    "schedule:monthly",
+    ":enablePreCommit"
   ],
   "packageRules": [
+    {
+      "enabled": false,
+      "matchPackageNames": [
+        "asottile/blacken-docs",
+        "asottile/pyupgrade",
+        "executablebooks/mdformat",
+        "pappasam/toml-sort",
+        "PyCQA/docformatter",
+        "python-poetry/poetry",
+        "tcort/markdown-link-check"
+      ]
+    },
     {
       "groupName": "{{packageFileDir}} dependency updates",
       "matchManagers": [
         "poetry",
-        "pip_requirements"
+        "pip_requirements",
+        "pre-commit"
       ]
     }
   ]
