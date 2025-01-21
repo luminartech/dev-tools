@@ -6,7 +6,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from dev_tools.local.generate_hook_docs import generate_hooks_documentation, update_hooks_documentation_in_readme
+from dev_tools.generate_hook_docs import generate_hooks_documentation, update_hooks_documentation_in_readme
 
 if TYPE_CHECKING:
     from pyfakefs.fake_filesystem import FakeFilesystem

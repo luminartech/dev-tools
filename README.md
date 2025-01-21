@@ -20,6 +20,7 @@ These tools are used to help developers in their day-to-day tasks.
   - [`go-fmt`](#go-fmt)
   - [`go-imports`](#go-imports)
   - [`go-revive`](#go-revive)
+  - [`generate-hook-docs`](#generate-hook-docs)
   - [`check-number-of-lines-count`](#check-number-of-lines-count)
   - [`check-shellscript-set-options`](#check-shellscript-set-options)
   - [`check-jira-reference-in-todo`](#check-jira-reference-in-todo)
@@ -95,6 +96,10 @@ Order go imports
 ### `go-revive`
 
 Run Go Revive linter
+
+### `generate-hook-docs`
+
+Generate markdown documentation from the hook descriptions in `.pre-commit-hooks.yaml` into the `README.md`. Docs are generated between `hooks-doc start` and `hooks-doc end` markdown comment blocks.
 
 ### `check-number-of-lines-count`
 
