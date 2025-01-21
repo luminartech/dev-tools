@@ -71,6 +71,13 @@
   additional_dependencies: [github.com/mgechev/revive@v1.5.1]
   language: golang
   types: [go]
+- id: generate-hook-docs
+  name: generate hook docs
+  description: Generate markdown documentation from the hook descriptions in `.pre-commit-hooks.yaml` into the `README.md`. Docs are generated between `hooks-doc start` and `hooks-doc end` markdown comment blocks.
+  entry: dev_tools/generate_hook_docs.py
+  language: python
+  files: (README.md|.pre-commit-hooks.yaml)
+  additional_dependencies: [pre-commit>=3.5.0]
 - id: check-number-of-lines-count
   name: Check Number of Lines
   description: Check that number of lines in scripts do not exceed max-lines. Use `--max-lines=<number>` to set the maximum number of lines. Default is 30 for shell scripts.
