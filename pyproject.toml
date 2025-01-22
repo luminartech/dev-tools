@@ -47,13 +47,14 @@ pyfakefs = ">=5"
 ruamel-yaml = ">=0.18.6"
 
 [tool.poetry.scripts]
-configure-vscode-for-bazel = "dev_tools.configure_vscode_for_bazel:main"
-whoowns = "dev_tools.find_owner:main"
 check-jira-reference-in-todo = "dev_tools.check_jira_reference_in_todo:main"
 check-number-of-lines-count = "dev_tools.check_number_of_lines_count:main"
+check-ownership = "dev_tools.check_ownership:main"
 check-shellscript-set-options = "dev_tools.check_shellscript_set_options:main"
 check-useless-exclude-paths-hooks = "dev_tools.check_useless_exclude_paths_hooks:main"
-check-ownership = "dev_tools.check_ownership:main"
+configure-vscode-for-bazel = "dev_tools.configure_vscode_for_bazel:main"
+generate-hook-docs = "dev_tools.generate_hook_docs:main"
+whoowns = "dev_tools.find_owner:main"
 
 [tool.pylint.FORMAT]
 max-line-length = 120
