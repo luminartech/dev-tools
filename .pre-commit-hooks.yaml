@@ -106,6 +106,14 @@
   entry: check-useless-exclude-paths-hooks
   language: python
   additional_dependencies: ["pre-commit >= 3.5.0"]
+- id: sync-vscode-config
+  name: generate hook docs
+  description: Sync settings and extensions from `devcontainer.json` to json files in `.vscode` folder.
+  entry: sync-vscode-config
+  language: python
+  stages:
+    - post-checkout
+    - post-merge
 - id: check-ownership
   name: Check `.github/CODEOWNERS` consistency (can take a while)
   description: |

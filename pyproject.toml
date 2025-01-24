@@ -54,6 +54,7 @@ check-shellscript-set-options = "dev_tools.check_shellscript_set_options:main"
 check-useless-exclude-paths-hooks = "dev_tools.check_useless_exclude_paths_hooks:main"
 configure-vscode-for-bazel = "dev_tools.configure_vscode_for_bazel:main"
 generate-hook-docs = "dev_tools.generate_hook_docs:main"
+sync-vscode-config = "dev_tools.sync_vscode_config:main"
 whoowns = "dev_tools.find_owner:main"
 
 [tool.pylint.FORMAT]

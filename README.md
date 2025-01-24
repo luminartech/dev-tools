@@ -25,6 +25,7 @@ These tools are used to help developers in their day-to-day tasks.
   - [`check-shellscript-set-options`](#check-shellscript-set-options)
   - [`check-jira-reference-in-todo`](#check-jira-reference-in-todo)
   - [`check-non-existing-and-duplicate-excludes`](#check-non-existing-and-duplicate-excludes)
+  - [`sync-vscode-config`](#sync-vscode-config)
   - [`check-ownership`](#check-ownership)
 - [Contributing](#contributing)
 
@@ -116,6 +117,10 @@ Check that all TODO comments follow the same pattern and link a Jira ticket: `TO
 ### `check-non-existing-and-duplicate-excludes`
 
 Check for non existing and duplicate paths in `.pre-commit-config.yaml`. Background: In a big codebase, the exclude lists can be quite long and it's easy to make a typo or forget to remove an entry when it's no longer needed.
+
+### `sync-vscode-config`
+
+Sync settings and extensions from `devcontainer.json` to json files in `.vscode` folder.
 
 ### `check-ownership`
 

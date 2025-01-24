@@ -22,6 +22,14 @@ repos:
         files: (README.md|.pre-commit-hooks.yaml|dev_tools/generate_hook_docs.py)
         additional_dependencies:
           - pre-commit>=3.5.0
+      - id: sync-vscode-config
+        name: generate hook docs
+        description: Sync settings and extensions from devcontainer.json to json files in .vscode folder
+        entry: dev_tools/sync_vscode_config.py
+        language: python
+        stages:
+          - post-checkout
+          - post-merge
   - repo: https://github.com/pre-commit/pre-commit
     rev: v3.5.0
     hooks:
