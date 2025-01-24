@@ -1,0 +1,29 @@
+// For format details, see https://aka.ms/devcontainer.json
+{
+    "build": {
+        // Path is relative to the devcontainer.json file.
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "charliermarsh.ruff",
+                "eamodio.gitlens",
+                "ms-azuretools.vscode-docker",
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-vscode-remote.vscode-remote-extensionpack",
+                "yzhang.markdown-all-in-one"
+            ],
+            "settings": {
+                "[python]": {
+                    "editor.defaultFormatter": "charliermarsh.ruff",
+                    "editor.formatOnType": true
+                },
+                "files.watcherExclude": {
+                    "**/__pycache__/**": true
+                }
+            }
+        }
+    }
+}
