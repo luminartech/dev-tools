@@ -41,6 +41,11 @@ repos:
       - id: check-executables-have-shebangs
       - id: check-illegal-windows-names
       - id: check-json
+        exclude: |
+          (?x)^(
+            .devcontainer/devcontainer.json|
+            .vscode/
+          )
       - id: check-merge-conflict
       - id: check-shebang-scripts-are-executable
       - id: check-toml
@@ -58,6 +63,11 @@ repos:
         args: [--branch, master]
       - id: pretty-format-json
         args: [--autofix]
+        exclude: |
+          (?x)^(
+            .devcontainer/devcontainer.json|
+            .vscode/
+          )
       - id: trailing-whitespace
   - repo: https://github.com/mattlqx/pre-commit-search-and-replace
     rev: v1.1.8
