@@ -10,8 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from pre_commit.clientlib import load_config
-
-PRE_COMMIT_CONFIG_YAML = ".pre-commit-config.yaml"
+from pre_commit.constants import CONFIG_FILE
 
 
 class Hook:
@@ -90,12 +89,12 @@ def have_non_existent_paths_or_duplicates(hooks_list: list[Any]) -> bool:
     ]
 
     if non_existing_paths:
-        print(f"Remove the following non-existing exclusions in {PRE_COMMIT_CONFIG_YAML}:")
+        print(f"Remove the following non-existing exclusions in {CONFIG_FILE}:")
         for hook_id, path in non_existing_paths:
             print(f"In hook {hook_id}: {str(path).split('Repo/', 1)[-1]}")
 
     if duplicates:
-        print(f"Remove the following duplicates from the exclusions in {PRE_COMMIT_CONFIG_YAML}:")
+        print(f"Remove the following duplicates from the exclusions in {CONFIG_FILE}:")
         for hook_id, duplicate in duplicates:
             print(f"In hook {hook_id}: {str(duplicate).split('Repo/', 1)[-1]}")
 
@@ -104,7 +103,7 @@ def have_non_existent_paths_or_duplicates(hooks_list: list[Any]) -> bool:
 
 def main() -> int:
     repo_root = Path.cwd()
-    pre_commit_config = repo_root / PRE_COMMIT_CONFIG_YAML
+    pre_commit_config = repo_root / CONFIG_FILE
     return 1 if have_non_existent_paths_or_duplicates(load_hooks(repo_root, pre_commit_config)) else 0
 
 
