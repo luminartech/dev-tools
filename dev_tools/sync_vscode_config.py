@@ -5,17 +5,19 @@
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
+from typing import Any
+
+import orjson as json
 
 
-def load_devcontainer_config(devcontainer_json_path: Path) -> dict:
-    return json.loads(devcontainer_json_path.read_text())["customization"]["vscode"]
+def load_devcontainer_config(devcontainer_json_path: Path) -> Any:  # noqa: ANN401
+    return json.loads(devcontainer_json_path.read_text())["customizations"]["vscode"]
 
 
-def update_vscode_config_json(settings_json: Path, settings_config: dict) -> None:
-    settings_json.write_text(json.dumps(settings_config))
+def update_vscode_config_json(settings_json: Path, settings_to_merge: dict) -> None:
+    settings_json.write_text(json.dumps(settings_to_merge))
 
 
 def main() -> int:
