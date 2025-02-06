@@ -39,13 +39,13 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.8"
 pre-commit = ">=3.5.0"
+pyjson5 = ">=1.6.8"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7"
 pytest-cov = ">=4"
 pyfakefs = ">=5"
 ruamel-yaml = ">=0.18.6"
-orjson = ">=3.10.5"
 
 [tool.poetry.scripts]
 check-jira-reference-in-todo = "dev_tools.check_jira_reference_in_todo:main"

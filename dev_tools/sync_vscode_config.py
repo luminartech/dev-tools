@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-import orjson as json
+import pyjson5 as json
 
 
 def load_devcontainer_config(devcontainer_json_path: Path) -> Any:  # noqa: ANN401
