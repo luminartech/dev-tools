@@ -5,16 +5,17 @@
 
 from __future__ import annotations
 
+import json  # for writing JSON, we need a pretty printer
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-import pyjson5 as json
+import pyjson5  # for parsing comments, we need JSON5
 
 
 def load_devcontainer_config(devcontainer_json_path: Path) -> Any:  # noqa: ANN401
-    return json.loads(devcontainer_json_path.read_text())["customizations"]["vscode"]
+    return pyjson5.loads(devcontainer_json_path.read_text())["customizations"]["vscode"]
 
 
 def get_and_set(dict: Any, key: Any, value: Any) -> Any:  # noqa: ANN401
@@ -46,9 +47,9 @@ def update_dict_overwriting_values(dict: Any, new_values_dict: Any) -> list[Dict
 
 
 def update_vscode_settings_json(settings_json: Path, settings_dict: dict) -> list[DictOverwriteRecord]:
-    old_settings_dict = json.loads(settings_json.read_text()) if settings_json.is_file() else {}
+    old_settings_dict = pyjson5.loads(settings_json.read_text()) if settings_json.is_file() else {}
     overwrite_records = update_dict_overwriting_values(old_settings_dict, settings_dict)
-    settings_json.write_text(json.dumps(old_settings_dict, indent=2))
+    settings_json.write_text(json.dumps(old_settings_dict, indent=4))
     return overwrite_records
 
 
