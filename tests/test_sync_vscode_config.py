@@ -101,3 +101,21 @@ def test__update_vscode_settings_json__leaves_custom_settings(tmp_path: Path) ->
     assert '"another.setting":5' in text_without_whitespace
     assert '"redhat.telemetry.enabled":false' in text_without_whitespace
     assert overwrite_records == []
+
+
+def test__update_vscode_settings_json__formats_the_json(tmp_path: Path) -> None:
+    settings_json_path = tmp_path / "settings.json"
+
+    settings = {
+        "setting1": 1,
+        "setting2": 2,
+    }
+    update_vscode_settings_json(settings_json_path, settings)
+
+    lines = settings_json_path.read_text().splitlines()
+    setting1_lines = [n for n, line in enumerate(lines) if "setting1" in line]
+    setting2_lines = [n for n, line in enumerate(lines) if "setting2" in line]
+
+    assert len(setting1_lines) == 1
+    assert len(setting2_lines) == 1
+    assert setting1_lines != setting2_lines

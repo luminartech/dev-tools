@@ -52,12 +52,11 @@ def update_vscode_settings_json(settings_json: Path, settings_dict: dict) -> lis
     return overwrite_records
 
 
-def update_vscode_extensions_json(extensions_json: Path, extensions_list: list) -> list[ListOverwriteRecord]:  # noqa: ARG001
+def update_vscode_extensions_json() -> list[ListOverwriteRecord]:
     return []
 
 
 def main() -> int:
-    # Add customizable indentation
     # print warnings for overwrites
     repo_root = Path.cwd()
     devcontainer_json = repo_root / ".devcontainer" / "devcontainer.json"
@@ -65,7 +64,7 @@ def main() -> int:
 
     devcontainer_config = load_devcontainer_config(devcontainer_json)
     update_vscode_settings_json(vs_code_folder / "settings.json", devcontainer_config["settings"])
-    update_vscode_extensions_json(vs_code_folder / "extensions.json", devcontainer_config["extensions"])
+    update_vscode_extensions_json()
 
     return 0
 
