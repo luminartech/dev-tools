@@ -37,7 +37,7 @@ class ListOverwriteRecord:
     new_value: Any
 
 
-def update_dict_overwriting_values(dict: Any, new_values_dict: Any) -> list[DictOverwriteRecord]:  # noqa: ANN401
+def update_dict_overwriting_values(dict: Any, new_values_dict: dict) -> list[DictOverwriteRecord]:  # noqa: ANN401
     overwrite_records = []
     for key, value in new_values_dict.items():
         old_value = get_and_set(dict, key, value)
@@ -46,14 +46,22 @@ def update_dict_overwriting_values(dict: Any, new_values_dict: Any) -> list[Dict
     return overwrite_records
 
 
+def combine_lists_without_duplicates(the_list: Any, new_values_list: list) -> list[str]:  # noqa: ANN401
+    return sorted(set(the_list) | set(new_values_list))
+
+
 def update_vscode_settings_json(settings_json: Path, settings_dict: dict) -> list[DictOverwriteRecord]:
     old_settings_dict = pyjson5.loads(settings_json.read_text()) if settings_json.is_file() else {}
     overwrite_records = update_dict_overwriting_values(old_settings_dict, settings_dict)
-    settings_json.write_text(json.dumps(old_settings_dict, indent=4))
+    settings_json.write_text(json.dumps(old_settings_dict, indent=4, ensure_ascii=False))
     return overwrite_records
 
 
-def update_vscode_extensions_json() -> list[ListOverwriteRecord]:
+def update_vscode_extensions_json(extensions_json: Path, extensions_list: list[str]) -> list[ListOverwriteRecord]:
+    old_extensions_dict = pyjson5.loads(extensions_json.read_text()) if extensions_json.is_file() else {}
+    old_extensions_list = old_extensions_dict.get("recommendations", [])
+    old_extensions_dict["recommendations"] = combine_lists_without_duplicates(old_extensions_list, extensions_list)
+    extensions_json.write_text(json.dumps(old_extensions_dict, indent=4, ensure_ascii=False))
     return []
 
 
@@ -65,7 +73,7 @@ def main() -> int:
 
     devcontainer_config = load_devcontainer_config(devcontainer_json)
     update_vscode_settings_json(vs_code_folder / "settings.json", devcontainer_config["settings"])
-    update_vscode_extensions_json()
+    update_vscode_extensions_json(vs_code_folder / "extensions.json", devcontainer_config["extensions"])
 
     return 0
 

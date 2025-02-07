@@ -6,7 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from dev_tools.sync_vscode_config import DictOverwriteRecord, load_devcontainer_config, update_vscode_settings_json
+from dev_tools.sync_vscode_config import (
+    DictOverwriteRecord,
+    load_devcontainer_config,
+    update_vscode_extensions_json,
+    update_vscode_settings_json,
+)
 
 
 @pytest.fixture
@@ -119,3 +124,40 @@ def test__update_vscode_settings_json__formats_the_json(tmp_path: Path) -> None:
     assert len(setting1_lines) == 1
     assert len(setting2_lines) == 1
     assert setting1_lines != setting2_lines
+
+
+def test__update_vscode_extensions_json__creates_new_recommendations(tmp_path: Path) -> None:
+    extensions_json_path = tmp_path / "extensions.json"
+    update_vscode_extensions_json(extensions_json_path, ["charliermarsh.ruff"])
+    assert extensions_json_path.exists()
+    text_without_whitespace = read_text_without_whitespace(extensions_json_path)
+    assert re.search("recommendations.*charliermarsh.ruff", text_without_whitespace)
+
+
+def test__update_vscode_extensions_json__adds_new_recommendations(tmp_path: Path) -> None:
+    extensions_json_path = tmp_path / "extensions.json"
+    extensions_json_path.write_text('{"recommendations":["charliermarsh.ruff"]}')
+
+    update_vscode_extensions_json(extensions_json_path, ["ms-python.python"])
+
+    text_without_whitespace = read_text_without_whitespace(extensions_json_path)
+    assert re.search("recommendations.*charliermarsh.ruff", text_without_whitespace)
+    assert re.search("recommendations.*ms-python.python", text_without_whitespace)
+
+
+def test__update_vscode_extensions_json__makes_recommendations_unique(tmp_path: Path) -> None:
+    extensions_json_path = tmp_path / "extensions.json"
+    extensions_json_path.write_text('{"recommendations":["charliermarsh.ruff"]}')
+
+    update_vscode_extensions_json(extensions_json_path, ["charliermarsh.ruff"])
+
+    text_without_whitespace = read_text_without_whitespace(extensions_json_path)
+    assert len(re.findall("charliermarsh.ruff", text_without_whitespace)) == 1
+
+
+def test__update_vscode_extensions_json__supports_utf8_chars(tmp_path: Path) -> None:
+    extensions_json_path = tmp_path / "extensions.json"
+    update_vscode_extensions_json(extensions_json_path, ["🐍"])
+
+    text_without_whitespace = read_text_without_whitespace(extensions_json_path)
+    assert "🐍" in text_without_whitespace
