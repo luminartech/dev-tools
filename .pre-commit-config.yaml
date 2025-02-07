@@ -34,7 +34,7 @@ repos:
         files: |
           (?x)^(
             (.devcontainer/)?devcontainer.json|
-            .vscode/extensions.json
+            .vscode/extensions.json|
             .vscode/settings.json
           )
         additional_dependencies:

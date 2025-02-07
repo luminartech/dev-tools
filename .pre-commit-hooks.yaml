@@ -117,7 +117,7 @@
   files: |
     (?x)^(
       (.devcontainer/)?devcontainer.json|
-      .vscode/extensions.json
+      .vscode/extensions.json|
       .vscode/settings.json
     )
   additional_dependencies: [pyjson5>=1.6.8]
