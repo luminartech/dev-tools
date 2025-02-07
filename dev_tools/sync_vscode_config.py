@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-import json  # for writing JSON, we need a pretty printer
+import json  # for writing JSON, we need a pretty printer. PyJSON5 doesn't support this: https://github.com/Kijewski/pyjson5/issues/19#issuecomment-970504400
 import sys
 from dataclasses import dataclass
 from pathlib import Path
