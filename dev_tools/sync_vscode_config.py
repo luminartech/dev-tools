@@ -74,7 +74,7 @@ def update_vscode_settings_json(
     return overwrite_records
 
 
-def get_extension_recommendations_list(extensions_dict: Any) -> list[str]:  # noqa: ANN401
+def get_extension_recommendations(extensions_dict: Any) -> list[str]:  # noqa: ANN401
     recommendations = extensions_dict.get("recommendations", [])
     if not isinstance(recommendations, list):
         msg = "Invalid settings.json: recommendations must be a list"
@@ -90,7 +90,7 @@ def update_vscode_extensions_json(
     extensions_json: Path, extensions_list: list[str], indent: int = DEFAULT_INDENT
 ) -> list[ListOverwriteRecord]:
     old_extensions_dict = pyjson5.loads(extensions_json.read_text()) if extensions_json.is_file() else {}
-    old_extensions_list = get_extension_recommendations_list(old_extensions_dict)
+    old_extensions_list = get_extension_recommendations(old_extensions_dict)
     old_extensions_dict["recommendations"], _ = combine_lists_without_duplicates(old_extensions_list, extensions_list)
     write_vscode_json(extensions_json, old_extensions_dict, indent=indent)
     return []

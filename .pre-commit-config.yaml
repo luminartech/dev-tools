@@ -37,6 +37,7 @@ repos:
             .vscode/extensions.json|
             .vscode/settings.json
           )
+        always_run: true # Required for post-* hooks
         additional_dependencies:
           - pyjson5>=1.6.8
   - repo: https://github.com/pre-commit/pre-commit
