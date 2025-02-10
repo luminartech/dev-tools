@@ -23,7 +23,7 @@ repos:
         additional_dependencies:
           - pre-commit>=3.5.0
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v3.5.0
+    rev: v3.8.0
     hooks:
       - id: validate_manifest
   - repo: https://github.com/pre-commit-ci/pre-commit-ci-config
@@ -74,11 +74,11 @@ repos:
     hooks:
       - id: search-and-replace
   - repo: https://github.com/pre-commit/sync-pre-commit-deps
-    rev: v0.0.1 # Last version to support Python 3.8
+    rev: v0.0.3 # Last version to support Python 3.8
     hooks:
       - id: sync-pre-commit-deps
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.6
+    rev: v0.9.5
     hooks:
       - id: ruff-format
       - id: ruff
@@ -116,7 +116,7 @@ repos:
       - id: toml-sort-fix
         exclude: "\\.lock$"
   - repo: https://github.com/google/yamlfmt
-    rev: v0.14.0
+    rev: v0.15.0
     hooks:
       - id: yamlfmt
   - repo: https://github.com/adrienverge/yamllint
@@ -125,7 +125,7 @@ repos:
       - id: yamllint
         args: [--strict]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.14.1
+    rev: v1.15.0
     hooks:
       - id: mypy
   - repo: https://github.com/asottile/pyupgrade
@@ -140,7 +140,7 @@ repos:
         args: [--in-place, --config, pyproject.toml]
         additional_dependencies: [tomli==2.0.1]
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.30.0
+    rev: 0.31.1
     hooks:
       - id: check-github-workflows
       - id: check-renovate
@@ -150,7 +150,7 @@ repos:
       - id: actionlint
         additional_dependencies: [pyflakes>=3.1.0, shellcheck-py>=0.9.0.5]
   - repo: https://github.com/crate-ci/typos
-    rev: dictgen-v0.3.1
+    rev: v0.4.0
     hooks:
       - id: typos
         exclude_types:
@@ -178,7 +178,7 @@ repos:
       - id: markdown-link-check
         args: ["--quiet", "--config", ".md-link-config.json"]
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.43.0
+    rev: v0.44.0
     hooks:
       - id: markdownlint
         args: ["--dot", "--fix"]
