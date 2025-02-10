@@ -112,6 +112,7 @@
   entry: sync-vscode-config
   language: python
   stages:
+    - pre-commit
     - post-checkout
     - post-merge
   files: |
