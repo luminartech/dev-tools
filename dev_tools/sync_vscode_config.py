@@ -142,9 +142,9 @@ def main() -> int:
 
     devcontainer_config = load_devcontainer_config(args.devcontainer_json)
     settings_findings = update_vscode_settings_json(
-        args.settings_path, devcontainer_config["settings"], indent=args.indent
+        args.settings_path, devcontainer_config.get("settings", {}), indent=args.indent
     )
-    update_vscode_extensions_json(args.extensions_path, devcontainer_config["extensions"])
+    update_vscode_extensions_json(args.extensions_path, devcontainer_config.get("extensions", []))
     report_settings_findings(settings_findings, args.settings_path)
 
     return 0
