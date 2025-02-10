@@ -24,7 +24,7 @@ repos:
         additional_dependencies:
           - pre-commit>=3.5.0
       - id: sync-vscode-config
-        name: generate hook docs
+        name: Sync VSCode Config
         description: Sync settings and extensions from devcontainer.json to json files in .vscode folder
         entry: dev_tools/sync_vscode_config.py
         language: python
