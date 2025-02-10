@@ -136,9 +136,6 @@ def main() -> int:
     lvl = logging.INFO if args.verbose else logging.WARNING
     logging.basicConfig(level=lvl, format="%(asctime)s [%(levelname)s] %(message)s")
 
-    logging.error("failing deliberately")
-    return 1
-
     msg = f"Syncing VS Code settings and extensions from {args.devcontainer_json} to {args.settings_path} and {args.extensions_path}"
     logging.info(msg)
 
