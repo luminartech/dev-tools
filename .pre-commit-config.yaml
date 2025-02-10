@@ -32,7 +32,6 @@ repos:
         stages:
           - post-checkout
           - post-merge
-          - manual
         files: |
           (?x)^(
             (.devcontainer/)?devcontainer.json|

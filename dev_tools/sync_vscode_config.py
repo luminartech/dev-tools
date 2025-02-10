@@ -25,12 +25,6 @@ class DictOverwriteRecord:
     new_value: Any
 
 
-@dataclass
-class ListOverwriteRecord:
-    old_value: Any
-    new_value: Any
-
-
 def load_devcontainer_config(devcontainer_json_path: Path) -> Any:  # noqa: ANN401
     return pyjson5.loads(devcontainer_json_path.read_text())["customizations"]["vscode"]
 
@@ -51,16 +45,15 @@ def update_dict_overwriting_values(dict: Any, new_values_dict: dict) -> list[Dic
 
 
 def combine_lists_without_duplicates(
-    the_list: Any,  # noqa: ANN401
+    old_values: Any,  # noqa: ANN401
     new_values_list: list,
-) -> tuple[list[str], list[DictOverwriteRecord]]:
-    unique_values = set(the_list)
-    new_values_set = set(new_values_list)
-    combined_set = unique_values | new_values_set
-    return (sorted(combined_set), [])
+) -> list[str]:
+    combined_set = set(old_values) | set(new_values_list)
+    return sorted(combined_set)
 
 
 def write_vscode_json(json_path: Path, json_dict: dict, indent: int) -> None:
+    json_path.parent.mkdir(parents=True, exist_ok=True)
     json_path.write_text(json.dumps(json_dict, indent=indent, ensure_ascii=False) + "\n")
 
 
@@ -86,14 +79,20 @@ def get_extension_recommendations(extensions_dict: Any) -> list[str]:  # noqa: A
     return recommendations
 
 
+def filter_out_unwanted_recommendations(recommendations: list[str]) -> list[str]:
+    # extensions.json's unwantedRecommendations are not supported yet
+    return [item for item in recommendations if not item.startswith("-")]
+
+
 def update_vscode_extensions_json(
     extensions_json: Path, extensions_list: list[str], indent: int = DEFAULT_INDENT
-) -> list[ListOverwriteRecord]:
+) -> None:
     old_extensions_dict = pyjson5.loads(extensions_json.read_text()) if extensions_json.is_file() else {}
     old_extensions_list = get_extension_recommendations(old_extensions_dict)
-    old_extensions_dict["recommendations"], _ = combine_lists_without_duplicates(old_extensions_list, extensions_list)
+    old_extensions_dict["recommendations"] = combine_lists_without_duplicates(
+        old_extensions_list, filter_out_unwanted_recommendations(extensions_list)
+    )
     write_vscode_json(extensions_json, old_extensions_dict, indent=indent)
-    return []
 
 
 def report_settings_findings(findings: list[DictOverwriteRecord], settings_json: Path) -> None:

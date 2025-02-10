@@ -8,6 +8,7 @@ import pytest
 
 from dev_tools.sync_vscode_config import (
     DictOverwriteRecord,
+    combine_lists_without_duplicates,
     load_devcontainer_config,
     update_vscode_extensions_json,
     update_vscode_settings_json,
@@ -177,3 +178,19 @@ def test__update_vscode_extensions_json__adds_newline_at_the_end(tmp_path: Path)
 
     text = extensions_json_path.read_text()
     assert text.endswith("\n")
+
+
+def test__combine_lists_without_duplicates__combines_disjoint_lists() -> None:
+    list1 = ["a", "b", "c"]
+    list2 = ["d", "e", "f"]
+    combined = combine_lists_without_duplicates(list1, list2)
+    assert all(item in combined for item in "abcdef")
+
+
+def test__combine_lists_without_duplicates__combines_overlapping_lists() -> None:
+    list1 = ["a", "b", "c"]
+    list2 = ["b", "c", "d"]
+    combined = combine_lists_without_duplicates(list1, list2)
+    expected_items = {"a", "b", "c", "d"}
+    assert all(item in combined for item in expected_items)
+    assert len(combined) == len(expected_items)
