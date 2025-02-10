@@ -14,7 +14,7 @@ from pre_commit.constants import MANIFEST_FILE
 
 
 def generate_hooks_documentation(hooks: list[dict]) -> str:
-    return "\n".join([f'### `{hook["id"]}`\n\n{hook["description"]}\n' for hook in hooks])
+    return "\n".join([f"### `{hook['id']}`\n\n{hook['description']}\n" for hook in hooks])
 
 
 def update_hooks_documentation_in_readme(readme: Path, docs: str) -> None:

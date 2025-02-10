@@ -60,7 +60,7 @@ def get_owners(item: Path, level: int) -> dict[str, tuple[str, ...]]:
 def print_owners(owners: dict[str, tuple[str, ...]]) -> None:
     max_path_length = max(len(item) for item in owners)
     for item, owner in owners.items():
-        print(f'{item:{max_path_length}} -> {", ".join(owner)}')
+        print(f"{item:{max_path_length}} -> {', '.join(owner)}")
 
 
 if __name__ == "__main__":
