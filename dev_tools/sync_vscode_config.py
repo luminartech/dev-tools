@@ -108,7 +108,6 @@ def report_settings_findings(findings: list[DictOverwriteRecord], settings_json:
 def parse_arguments(args: Sequence[str] | None = None) -> argparse.Namespace:
     repo_root = Path.cwd()
     parser = argparse.ArgumentParser(description="Sync VS Code settings and extensions from devcontainer.json")
-    parser.add_argument("files", nargs="+", help="Files to process")
     parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
     parser.add_argument(
         "--devcontainer-json",
