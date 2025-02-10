@@ -120,7 +120,7 @@ Check for non existing and duplicate paths in `.pre-commit-config.yaml`. Backgro
 
 ### `sync-vscode-config`
 
-Sync settings and extensions from `devcontainer.json` to json files in `.vscode` folder.
+Sync settings and extensions from devcontainer.json to json files in .vscode folder.
 
 ### `check-ownership`
 
