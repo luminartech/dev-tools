@@ -40,6 +40,7 @@ repos:
             .vscode/settings.json
           )
         always_run: true # Required for post-* hooks
+        pass_filenames: false
         additional_dependencies:
           - pyjson5>=1.6.8
   - repo: https://github.com/pre-commit/pre-commit

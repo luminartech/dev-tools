@@ -120,6 +120,8 @@
       .vscode/extensions.json|
       .vscode/settings.json
     )
+  always_run: true
+  pass_filenames: false
   additional_dependencies: [pyjson5>=1.6.8]
 - id: check-ownership
   name: Check `.github/CODEOWNERS` consistency (can take a while)
