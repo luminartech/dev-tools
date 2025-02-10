@@ -126,6 +126,14 @@ def test__update_vscode_settings_json__formats_the_json(tmp_path: Path) -> None:
     assert setting1_lines != setting2_lines
 
 
+def test__update_vscode_settings_json__adds_newline_at_the_end(tmp_path: Path) -> None:
+    settings_json_path = tmp_path / "settings.json"
+    update_vscode_settings_json(settings_json_path, {"setting1": 1})
+
+    text = settings_json_path.read_text()
+    assert text.endswith("\n")
+
+
 def test__update_vscode_extensions_json__creates_new_recommendations(tmp_path: Path) -> None:
     extensions_json_path = tmp_path / "extensions.json"
     update_vscode_extensions_json(extensions_json_path, ["charliermarsh.ruff"])
@@ -161,3 +169,11 @@ def test__update_vscode_extensions_json__supports_utf8_chars(tmp_path: Path) -> 
 
     text_without_whitespace = read_text_without_whitespace(extensions_json_path)
     assert "🐍" in text_without_whitespace
+
+
+def test__update_vscode_extensions_json__adds_newline_at_the_end(tmp_path: Path) -> None:
+    extensions_json_path = tmp_path / "extensions.json"
+    update_vscode_extensions_json(extensions_json_path, ["ms-python.python"])
+
+    text = extensions_json_path.read_text()
+    assert text.endswith("\n")

@@ -61,7 +61,7 @@ def combine_lists_without_duplicates(
 
 
 def write_vscode_json(json_path: Path, json_dict: dict, indent: int) -> None:
-    json_path.write_text(json.dumps(json_dict, indent=indent, ensure_ascii=False))
+    json_path.write_text(json.dumps(json_dict, indent=indent, ensure_ascii=False) + "\n")
 
 
 def update_vscode_settings_json(

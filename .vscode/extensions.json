@@ -6,7 +6,6 @@
         "ms-python.python",
         "ms-python.vscode-pylance",
         "ms-vscode-remote.vscode-remote-extensionpack",
-        "testtest",
         "yzhang.markdown-all-in-one"
     ]
 }
