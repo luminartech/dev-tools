@@ -15,7 +15,11 @@
         "pappasam/toml-sort",
         "PyCQA/docformatter",
         "python-poetry/poetry",
-        "tcort/markdown-link-check"
+        "tcort/markdown-link-check",
+        "pre-commit/mirrors-mypy",
+        "pre-commit/sync-pre-commit-deps",
+        "pre-commit/pre-commit",
+        "python-jsonschema/check-jsonschema"
       ]
     },
     {

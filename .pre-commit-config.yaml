@@ -23,7 +23,7 @@ repos:
         additional_dependencies:
           - pre-commit>=3.5.0
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v3.8.0
+    rev: v3.5.0 # Last version to support Python 3.8
     hooks:
       - id: validate_manifest
   - repo: https://github.com/pre-commit-ci/pre-commit-ci-config
@@ -74,7 +74,7 @@ repos:
     hooks:
       - id: search-and-replace
   - repo: https://github.com/pre-commit/sync-pre-commit-deps
-    rev: v0.0.3 # Last version to support Python 3.8
+    rev: v0.0.1 # Last version to support Python 3.8
     hooks:
       - id: sync-pre-commit-deps
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -125,7 +125,7 @@ repos:
       - id: yamllint
         args: [--strict]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
+    rev: v1.14.1 # Last version to support Python 3.8
     hooks:
       - id: mypy
   - repo: https://github.com/asottile/pyupgrade
@@ -140,7 +140,7 @@ repos:
         args: [--in-place, --config, pyproject.toml]
         additional_dependencies: [tomli==2.0.1]
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.31.1
+    rev: 0.30.0 # Last version to support Python 3.8
     hooks:
       - id: check-github-workflows
       - id: check-renovate
