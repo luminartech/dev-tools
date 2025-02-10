@@ -137,6 +137,9 @@ def main() -> int:
     lvl = logging.INFO if args.verbose else logging.WARNING
     logging.basicConfig(level=lvl, format="%(asctime)s [%(levelname)s] %(message)s")
 
+    msg = f"Syncing VS Code settings and extensions from {args.devcontainer_json} to {args.settings_path} and {args.extensions_path}"
+    logging.info(msg)
+
     devcontainer_config = load_devcontainer_config(args.devcontainer_json)
     settings_findings = update_vscode_settings_json(
         args.settings_path, devcontainer_config["settings"], indent=args.indent
