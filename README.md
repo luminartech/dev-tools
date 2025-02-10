@@ -120,7 +120,7 @@ Check for non existing and duplicate paths in `.pre-commit-config.yaml`. Backgro
 
 ### `sync-vscode-config`
 
-Sync settings and extensions from devcontainer.json to json files in .vscode folder.
+Sync VSCode settings and extensions from `devcontainer.json` to `.vscode` folder. `devcontainer.json` will be now your source of truth. This hook is supported in post-checkout and post-merge stages, so consider installing it with `pre-commit -install -t` or defining your `default_install_hook_types` in the config. This hook works best if `.vscode/settings.json` and `.vscode/extensions.json` are not tracked by git.
 
 ### `check-ownership`
 
