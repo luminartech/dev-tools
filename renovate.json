@@ -23,6 +23,18 @@
       ]
     },
     {
+      "allowedVersions": "<=3.5.0",
+      "matchPackageNames": [
+        "pre-commit"
+      ]
+    },
+    {
+      "allowedVersions": "<2.0.0",
+      "matchPackageNames": [
+        "poetry"
+      ]
+    },
+    {
       "groupName": "{{packageFileDir}} dependency updates",
       "matchManagers": [
         "poetry",
