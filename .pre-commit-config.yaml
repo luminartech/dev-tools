@@ -1,4 +1,5 @@
 default_stages: [pre-commit]
+default_install_hook_types: [pre-commit, post-checkout, post-merge]
 
 ci:
   autoupdate_commit_msg: 'chore(deps): pre-commit.ci autoupdate'
