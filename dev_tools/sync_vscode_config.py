@@ -126,7 +126,7 @@ def parse_arguments(args: Sequence[str] | None = None) -> argparse.Namespace:
         default=repo_root / ".vscode" / "extensions.json",
         help="Path to extensions.json which will contain merged settings",
     )
-    parser.add_argument("--indent", type=int, default=4, help="Indentation level for JSON output")
+    parser.add_argument("--indent", type=int, default=DEFAULT_INDENT, help="Indentation level for JSON output")
     return parser.parse_args(args)
 
 
