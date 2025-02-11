@@ -1,5 +1,5 @@
 default_stages: [pre-commit]
-default_install_hook_types: [pre-commit, post-checkout, post-merge]
+default_install_hook_types: [pre-commit]
 
 ci:
   autoupdate_commit_msg: 'chore(deps): pre-commit.ci autoupdate'
@@ -30,8 +30,6 @@ repos:
         language: python
         args: [--verbose]
         stages:
-          - post-checkout
-          - post-merge
           - pre-commit
         files: |
           (?x)^(
@@ -39,7 +37,6 @@ repos:
             .vscode/extensions.json|
             .vscode/settings.json
           )
-        always_run: true # Required for post-* hooks
         pass_filenames: false
         additional_dependencies:
           - pyjson5>=1.6.8

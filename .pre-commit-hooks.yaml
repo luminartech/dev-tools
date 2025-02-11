@@ -108,20 +108,17 @@
   additional_dependencies: ["pre-commit >= 3.5.0"]
 - id: sync-vscode-config
   name: Sync VSCode Config
-  description: Sync VSCode settings and extensions from `devcontainer.json` to `.vscode` folder. `devcontainer.json` will be now your source of truth. This hook runs in `post-checkout` and `post-merge` stages, so consider installing it with `pre-commit -install -t` or defining your `default_install_hook_types` in the config.
+  description: Sync VSCode settings and extensions from `devcontainer.json` to `.vscode` folder. `devcontainer.json` will be now your source of truth. Entries defined in `settings.json` and `extensions.json` which don't exist in `devcontainer.json` will be left as is. If `settings.json` and `extensions.json` are ignored in Git, consider running the hook in `post-checkout` and `post-merge` stages by overwriting the `stages` config. In such a case, remember that you have to call `pre-commit install -t post-checkout -t post-merge` or define your `default_install_hook_types` in the pre-commit config.
   entry: sync-vscode-config
   language: python
   stages:
     - pre-commit
-    - post-checkout
-    - post-merge
   files: |
     (?x)^(
       (.devcontainer/)?devcontainer.json|
       .vscode/extensions.json|
       .vscode/settings.json
     )
-  always_run: true
   pass_filenames: false
   additional_dependencies: [pyjson5>=1.6.8]
 - id: check-ownership
