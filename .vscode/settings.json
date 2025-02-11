@@ -4,6 +4,11 @@
         "editor.formatOnType": true
     },
     "files.watcherExclude": {
-        "**/__pycache__/**": true,
-    }
+        "**/__pycache__/**": true
+    },
+    "python.testing.pytestArgs": [
+        "dev_tools"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }

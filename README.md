@@ -25,6 +25,7 @@ These tools are used to help developers in their day-to-day tasks.
   - [`check-shellscript-set-options`](#check-shellscript-set-options)
   - [`check-jira-reference-in-todo`](#check-jira-reference-in-todo)
   - [`check-non-existing-and-duplicate-excludes`](#check-non-existing-and-duplicate-excludes)
+  - [`sync-vscode-config`](#sync-vscode-config)
   - [`check-ownership`](#check-ownership)
 - [Contributing](#contributing)
 
@@ -116,6 +117,15 @@ Check that all TODO comments follow the same pattern and link a Jira ticket: `TO
 ### `check-non-existing-and-duplicate-excludes`
 
 Check for non existing and duplicate paths in `.pre-commit-config.yaml`. Background: In a big codebase, the exclude lists can be quite long and it's easy to make a typo or forget to remove an entry when it's no longer needed.
+
+### `sync-vscode-config`
+
+Sync VSCode settings and extensions from `devcontainer.json` to `.vscode` folder.
+`devcontainer.json` will be now your source of truth.
+Entries defined in `settings.json` and `extensions.json` which don't exist in `devcontainer.json` will be left as is.
+
+If `settings.json` and `extensions.json` are ignored in Git, consider running the hook in `post-checkout` and `post-merge` stages by overwriting the `stages` config.
+In this case, define your `default_install_hook_types` in the pre-commit config and set `always_run: true` for this hook.
 
 ### `check-ownership`
 
