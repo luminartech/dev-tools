@@ -1,5 +1,4 @@
 default_stages: [pre-commit]
-default_install_hook_types: [pre-commit]
 
 ci:
   autoupdate_commit_msg: 'chore(deps): pre-commit.ci autoupdate'
@@ -29,8 +28,6 @@ repos:
         entry: dev_tools/sync_vscode_config.py
         language: python
         args: [--verbose]
-        stages:
-          - pre-commit
         files: |
           (?x)^(
             (.devcontainer/)?devcontainer.json|
