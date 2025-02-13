@@ -114,12 +114,14 @@ def parse_arguments(args: Sequence[str] | None = None) -> argparse.Namespace:
         default=repo_root / ".devcontainer" / "devcontainer.json",
         help="Path to devcontainer.json",
     )
+    parser.add_argument("--no-sync-settings", action="store_true", help="Don't sync settings.json")
     parser.add_argument(
         "--settings-path",
         type=Path,
         default=repo_root / ".vscode" / "settings.json",
         help="Path to settings.json which will contain merged settings",
     )
+    parser.add_argument("--no-sync-extensions", action="store_true", help="Don't sync extensions.json")
     parser.add_argument(
         "--extensions-path",
         type=Path,
@@ -128,6 +130,14 @@ def parse_arguments(args: Sequence[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--indent", type=int, default=DEFAULT_INDENT, help="Indentation level for JSON output")
     return parser.parse_args(args)
+
+
+def _should_sync_settings(args: argparse.Namespace) -> bool:
+    return not args.no_sync_settings
+
+
+def _should_sync_extensions(args: argparse.Namespace) -> bool:
+    return not args.no_sync_extensions
 
 
 def main() -> int:
@@ -139,11 +149,14 @@ def main() -> int:
     logging.info(msg)
 
     devcontainer_config = load_devcontainer_config(args.devcontainer_json)
-    settings_findings = update_vscode_settings_json(
-        args.settings_path, devcontainer_config.get("settings", {}), indent=args.indent
-    )
-    update_vscode_extensions_json(args.extensions_path, devcontainer_config.get("extensions", []))
-    report_settings_findings(settings_findings, args.settings_path)
+    if _should_sync_settings(args):
+        settings_findings = update_vscode_settings_json(
+            args.settings_path, devcontainer_config.get("settings", {}), indent=args.indent
+        )
+        report_settings_findings(settings_findings, args.settings_path)
+
+    if _should_sync_extensions(args):
+        update_vscode_extensions_json(args.extensions_path, devcontainer_config.get("extensions", []))
 
     return 0
 
