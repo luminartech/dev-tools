@@ -156,7 +156,9 @@ def main() -> int:
         report_settings_findings(settings_findings, args.settings_path)
 
     if _should_sync_extensions(args):
-        update_vscode_extensions_json(args.extensions_path, devcontainer_config.get("extensions", []))
+        update_vscode_extensions_json(
+            args.extensions_path, devcontainer_config.get("extensions", []), indent=args.indent
+        )
 
     return 0
 
