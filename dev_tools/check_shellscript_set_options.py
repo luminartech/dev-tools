@@ -17,7 +17,8 @@ def _sets_options_or_is_nolint(line: str, expected_options: str) -> bool:
 
 
 def _is_valid_shell_file(filename: Path, expected_options: str) -> bool:
-    return any(_sets_options_or_is_nolint(line, expected_options) for line in filename.open().readlines())
+        with filename.open() as fd:
+            return any(_sets_options_or_is_nolint(line, expected_options) for line in fd.readlines())
 
 
 def _separate_bash_from_sh_files(filenames: Sequence[Path]) -> tuple[list[Path], list[Path]]:
