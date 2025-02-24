@@ -99,7 +99,6 @@ date
     assert main([str(file)]) == 1
 
 
-
 def test_fail_for_wrongly_formatted_nolinted_file(fs: FakeFilesystem) -> None:
     file = "nolint_file.sh"
     fs.create_file(
