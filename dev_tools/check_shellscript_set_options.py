@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 def _sets_options_or_is_nolint(line: str, expected_options: str) -> bool:
-    return line.strip() in [ expected_options, "# nolint(set_options)"]
+    return line.strip() in [expected_options, "# nolint(set_options)"]
 
 
 def _is_valid_shell_file(filename: Path, expected_options: str) -> bool:
