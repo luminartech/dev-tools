@@ -17,8 +17,8 @@ def _sets_options_or_is_nolint(line: str, expected_options: str) -> bool:
 
 
 def _is_valid_shell_file(filename: Path, expected_options: str) -> bool:
-        lines = filename.read_text().splitlines()
-        return any(_sets_options_or_is_nolint(line, expected_options) for line in lines)
+    lines = filename.read_text().splitlines()
+    return any(_sets_options_or_is_nolint(line, expected_options) for line in lines)
 
 
 def _separate_bash_from_sh_files(filenames: Sequence[Path]) -> tuple[list[Path], list[Path]]:
@@ -37,7 +37,7 @@ def _separate_bash_from_sh_files(filenames: Sequence[Path]) -> tuple[list[Path],
     return bash_files, sh_files
 
 
-def _are_shell_files_valid(shell_files: list[Path], expected_options :str) -> None:
+def _are_shell_files_valid(shell_files: list[Path], expected_options: str) -> bool:
     invalid_shell_files = [filename for filename in shell_files if not _is_valid_shell_file(filename, expected_options)]
     for filename in invalid_shell_files:
         print(f"Error: {filename} does not contain '{expected_options}'")
