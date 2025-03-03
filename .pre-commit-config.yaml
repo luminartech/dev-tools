@@ -6,6 +6,7 @@ ci:
   autofix_commit_msg: 'style: pre-commit.ci fixes'
   skip:
     - poetry-lock
+    - search-and-replace
 
 repos:
   - repo: meta
