@@ -44,12 +44,25 @@ def test_pass_for_sh_file(fs: FakeFilesystem) -> None:
     fs.create_file(
         file,
         contents="""#!/bin/sh
-# set -eux
+set -eux
 date
 """,
     )
 
-    assert main([str(file)]) == 1
+    assert main([str(file)]) == 0
+
+
+def test_pass_for_sh_file_from_env(fs: FakeFilesystem) -> None:
+    file = "sh_file.sh"
+    fs.create_file(
+        file,
+        contents="""#!/usr/bin/env sh
+set -eux
+date
+""",
+    )
+
+    assert main([str(file)]) == 0
 
 
 def test_one_valid_and_one_invalid_file(fs: FakeFilesystem) -> None:
@@ -57,7 +70,7 @@ def test_one_valid_and_one_invalid_file(fs: FakeFilesystem) -> None:
     fs.create_file(
         valid_file,
         contents="""#!/bin/sh
-# set -eux
+set -eux
 date
 """,
     )
@@ -66,7 +79,7 @@ date
     fs.create_file(
         invalid_file,
         contents="""#!/bin/bash
-# set -eux
+set -eux
 date
 """,
     )

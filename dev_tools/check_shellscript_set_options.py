@@ -21,14 +21,19 @@ def _is_valid_shell_file(filename: Path, expected_options: str) -> bool:
     return any(_sets_options_or_is_nolint(line, expected_options) for line in lines)
 
 
+def _get_possible_shebangs(program: str) -> tuple[str, ...]:
+    shebang_possibilities = ("#!/bin/{}", "#!/usr/bin/{}", "#!/usr/bin/env {}")
+    return tuple(shebang.format(program) for shebang in shebang_possibilities)
+
+
 def _separate_bash_from_sh_files(filenames: Sequence[Path]) -> tuple[list[Path], list[Path]]:
     bash_files = []
     sh_files = []
     for filename in filenames:
         first_line = filename.open().readline()
-        if first_line.startswith(("#!/bin/bash", "#!/usr/bin/bash")):
+        if first_line.startswith(_get_possible_shebangs("bash")):
             bash_files.append(filename)
-        elif first_line.startswith(("#!/bin/sh", "#!/usr/bin/sh")):
+        elif first_line.startswith(_get_possible_shebangs("sh")):
             sh_files.append(filename)
         else:
             msg = f"Unknown shell in {filename}: {first_line}. Only use this hook in combination with 'check-executables-have-shebangs' from https://github.com/pre-commit/pre-commit-hooks"
