@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 from typing import TYPE_CHECKING, Sequence
 
@@ -21,14 +22,20 @@ def _is_valid_shell_file(filename: Path, expected_options: str) -> bool:
     return any(_sets_options_or_is_nolint(line, expected_options) for line in lines)
 
 
+# Use the equivalent from identify once #80 is resolved
+def _does_shebang_match(program: str, first_line: str) -> bool:
+    match = re.match(rf"^#!.*{program}", first_line)
+    return match is not None
+
+
 def _separate_bash_from_sh_files(filenames: Sequence[Path]) -> tuple[list[Path], list[Path]]:
     bash_files = []
     sh_files = []
     for filename in filenames:
         first_line = filename.open().readline()
-        if first_line.startswith(("#!/bin/bash", "#!/usr/bin/bash")):
+        if _does_shebang_match("bash", first_line):
             bash_files.append(filename)
-        elif first_line.startswith(("#!/bin/sh", "#!/usr/bin/sh")):
+        elif _does_shebang_match("sh", first_line):
             sh_files.append(filename)
         else:
             msg = f"Unknown shell in {filename}: {first_line}. Only use this hook in combination with 'check-executables-have-shebangs' from https://github.com/pre-commit/pre-commit-hooks"
