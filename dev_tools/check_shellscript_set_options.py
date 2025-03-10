@@ -23,8 +23,8 @@ def _is_valid_shell_file(filename: Path, expected_options: str) -> bool:
 
 
 def _does_shebang_match(program: str, first_line: str) -> bool:
-    matches = re.match(rf"^#!.*{program}", first_line)
-    return matches is not None
+    match = re.match(rf"^#!.*{program}", first_line)
+    return match is not None
 
 
 def _separate_bash_from_sh_files(filenames: Sequence[Path]) -> tuple[list[Path], list[Path]]:
