@@ -22,6 +22,7 @@ def _is_valid_shell_file(filename: Path, expected_options: str) -> bool:
     return any(_sets_options_or_is_nolint(line, expected_options) for line in lines)
 
 
+# Use the equivalent from identify once #80 is resolved
 def _does_shebang_match(program: str, first_line: str) -> bool:
     match = re.match(rf"^#!.*{program}", first_line)
     return match is not None
