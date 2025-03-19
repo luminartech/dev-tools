@@ -3,7 +3,7 @@
   description: Check that `BUILD` files have a `.bazel` ending. `BUILD.bazel` file is the recommended way to name these files.
   entry: BUILD files must have a .bazel ending
   language: fail
-  files: "BUILD$"
+  files: "(^|/)BUILD$"
 - id: check-snake-case
   name: check snake case
   description: Check that all source code files are `snake_case`. We don't want to use `camelCase` or `kebab-case` file names.
