@@ -19,6 +19,7 @@ repos:
         description: Generate markdown documentation for pre-commit hooks in README.md
         entry: dev_tools/generate_hook_docs.py
         language: python
+        pass_filenames: false
         files: (README.md|.pre-commit-hooks.yaml|dev_tools/generate_hook_docs.py)
         additional_dependencies:
           - pre-commit>=3.5.0
