@@ -106,6 +106,7 @@
   description: "Check for non existing and duplicate paths in `.pre-commit-config.yaml`. Background: In a big codebase, the exclude lists can be quite long and it's easy to make a typo or forget to remove an entry when it's no longer needed."
   entry: check-useless-exclude-paths-hooks
   pass_filenames: false
+  always_run: true
   language: python
   additional_dependencies: ["pre-commit >= 3.5.0"]
 - id: sync-vscode-config
