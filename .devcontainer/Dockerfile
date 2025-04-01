@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/base:ubuntu-20.04@sha256:fb999144dd20bde5de9e06d8a5425d5611e17353ae37c5800adcc27d6c4e5bf2
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-20.04@sha256:8d29fff9fb395dfe5f7838ef54f487eef47e1da2426e62503d01fdb6d3430b15
 
 COPY requirements.txt /tmp/pip-tmp/requirements.txt
 
