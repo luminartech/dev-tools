@@ -96,6 +96,7 @@ ignore = [
   "E501", # Line length is the task of the formatter
   "FA100",
   "ISC001", # Conflicts with formatter
+  "LOG015",
   "S101",
   "S603",
   "T201"
