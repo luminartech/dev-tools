@@ -44,7 +44,7 @@ pyjson5 = ">=1.6.8"
 [tool.poetry.group.dev.dependencies]
 pytest = "==8.3.5"
 pytest-cov = "==5.0.0"
-pyfakefs = "==5.7.4"
+pyfakefs = "==5.8.0"
 ruamel-yaml = "==0.18.10"
 
 [tool.poetry.scripts]
@@ -96,6 +96,7 @@ ignore = [
   "E501", # Line length is the task of the formatter
   "FA100",
   "ISC001", # Conflicts with formatter
+  "LOG015",
   "S101",
   "S603",
   "T201"
