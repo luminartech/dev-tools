@@ -35,9 +35,12 @@ These tools are used to help developers in their day-to-day tasks.
 
 ### Configure VS Code for Bazel
 
-If you want to debug C++ Bazel targets in VS Code, you can use `configure-vscode-for-bazel` to generate a `.vscode/launch.json` file.
-This file then contains all targets for debugging in VS Code.
-To generate a defined set of targets, run
+If you want to work with C++ Bazel targets in VS Code, you can use `configure-vscode-for-bazel` to generate VS Code configuration. This tool supports generating:
+
+- a `.vscode/launch.json` file that contains selected targets for debugging in VS Code or
+- a `compile_commands.json` file using [bazel-compile-commands-extractor](https://github.com/hedronvision/bazel-compile-commands-extractor) for selected targets
+
+To generate `launch.json` for a defined set of targets, run
 
 ```shell
 configure-vscode-for-bazel //path/to/your/target/...
@@ -45,6 +48,14 @@ configure-vscode-for-bazel //path/to/your/target/...
 
 This will be forwarded to a `bazel query` listing all `cc_binary` and `cc_test` targets.
 Make sure you compile with debug symbols (`--compilation_mode=dbg`) enabled.
+
+To generate `compile_commands.json` for a defined set of targets, run
+
+```shell
+configure-vscode-for-bazel --generate-compile-commands ---build //path/to/your/target/...
+```
+
+This will create a `.vscode/BUILD.bazel` file and run the `bazel-compile-commands-extractor` to create a `compile_commands.json` in for workspace root. See [the usage documentation](https://github.com/hedronvision/bazel-compile-commands-extractor?tab=readme-ov-file#usage) for more information.
 
 ### Whoowns
 
