@@ -1,7 +1,9 @@
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
-"""Generate a VSCode's launch.json debug configurations for selected Bazel C++
-targets."""
+"""Generate VSCode configuration for selected Bazel C++ targets.
+
+- generate launch.json debug configurations
+"""
 
 from __future__ import annotations
 
@@ -31,6 +33,18 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Show verbose output.",
     )
+    parser.add_argument(
+        "--generate-launch-json",
+        action="store_true",
+        help="Generate the `launch.json` file.",
+    )
+    parser.add_argument(
+        "--no-generate-launch-json",
+        dest="generate_launch_json",
+        action="store_false",
+        help="Do not generate the `launch.json` file.",
+    )
+    parser.set_defaults(generate_launch_json=True)
     parser.add_argument(
         "-f",
         "--force",
@@ -182,10 +196,11 @@ def main() -> int:
         logging.warning("Bazel is required! Please install Bazel first.")
         return 1
 
-    update_launch_json(args.bazel_pattern, get_workspace_root() / ".vscode" / "launch.json", args.force)
+    if args.generate_launch_json:
+        update_launch_json(args.bazel_pattern, get_workspace_root() / ".vscode" / "launch.json", args.force)
 
-    logging.info("You can now run the debug target(s) in VS Code.")
-    print_build_reminder(args.bazel_pattern)
+        logging.info("You can now run the debug target(s) in VS Code.")
+        print_build_reminder(args.bazel_pattern)
     return 0
 
 
