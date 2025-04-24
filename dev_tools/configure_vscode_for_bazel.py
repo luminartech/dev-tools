@@ -65,16 +65,25 @@ def is_executable_rule(kind: str, entity: str) -> bool:
     return entity == "rule" and kind in ["cc_binary", "cc_test"]
 
 
-def confirm_or_abort(message: str = "") -> None:
+def confirm_or_abort(message: str = "") -> bool:
     if input(f"{message} y/N: ").lower() != "y":
         logging.warning("Aborted.")
-        sys.exit(1)
+        return False
+    return True
 
 
-def confirm_if_too_many_labels(labels: set[str], force: bool) -> None:  # noqa: FBT001
+def confirm_if_too_many_labels(labels: set[str], force: bool) -> bool:  # noqa: FBT001
     if len(labels) > MAX_TARGETS_WITHOUT_CONFIRMATION and not force:
         logging.warning("Found %d bazel targets. Are you sure you want to add them all to launch.json?", len(labels))
-        confirm_or_abort()
+        return confirm_or_abort()
+    return True
+
+
+def confirm_config_overwrite(config_location: Path, force: bool) -> bool:  # noqa: FBT001
+    if config_location.exists() and not force:
+        logging.warning("File %s already exists.", config_location.resolve())
+        return confirm_or_abort("Do you want to overwrite it?")
+    return True
 
 
 def query_bazel_for_labels(pattern: str) -> str:
@@ -96,12 +105,6 @@ def get_labels_from_bazel_query_output(output: str, pattern: str) -> set[str]:
     return labels
 
 
-def quit_if_no_labels_found(all_labels: set) -> None:
-    if not all_labels:
-        logging.error("In total, no executable targets were found. Aborting.")
-        sys.exit(1)
-
-
 def find_executable_labels(patterns: Sequence[str], force: bool) -> set[str]:  # noqa: FBT001
     logging.info("Searching for executable targets to generate launch.json...")
     labels_nested = (
@@ -112,9 +115,9 @@ def find_executable_labels(patterns: Sequence[str], force: bool) -> set[str]:  #
     logging.info("Found %d executable target(s).", len(labels))
     logging.debug("Executable labels: %s", labels)
 
-    quit_if_no_labels_found(labels)
-    confirm_if_too_many_labels(labels, force)
-    return labels
+    if confirm_if_too_many_labels(labels, force):
+        return labels
+    return set()  # we have no confirmation to continue
 
 
 def remove_prefix_if_present(text: str, prefix: str) -> str:
@@ -158,16 +161,16 @@ def get_new_launch_config(executable_labels: set[str]) -> dict[str, Any]:
     }
 
 
-def save_new_launch_config(new_config: dict[str, Any], config_location: Path, force: bool) -> None:  # noqa: FBT001
+def save_new_launch_config(new_config: dict[str, Any], config_location: Path, force: bool) -> bool:  # noqa: FBT001
     """Serializes the new_configuration to config_location.
 
     If the file already exists, asks for confirmation, unless force is set.
     """
-    if config_location.exists() and not force:
-        logging.warning("File %s already exists.", config_location.resolve())
-        confirm_or_abort("Do you want to overwrite it?")
-    config_location.write_text(json.dumps(new_config, indent=4))
-    logging.info("Saved new configuration to %s", config_location)
+    if confirm_config_overwrite(config_location, force):
+        config_location.write_text(json.dumps(new_config, indent=4))
+        logging.info("Saved new configuration to %s", config_location)
+        return True
+    return False
 
 
 def print_build_reminder(bazel_patterns: list[str]) -> None:
@@ -177,10 +180,11 @@ def print_build_reminder(bazel_patterns: list[str]) -> None:
     )
 
 
-def update_launch_json(bazel_patterns: list[str], config_location: Path, force: bool) -> None:  # noqa: FBT001
-    executable_labels = find_executable_labels(bazel_patterns, force)
-    new_config = get_new_launch_config(executable_labels)
-    save_new_launch_config(new_config, config_location, force)
+def update_launch_json(bazel_patterns: list[str], config_location: Path, force: bool) -> bool:  # noqa: FBT001
+    if executable_labels := find_executable_labels(bazel_patterns, force):
+        new_config = get_new_launch_config(executable_labels)
+        return save_new_launch_config(new_config, config_location, force)
+    return False
 
 
 def get_workspace_root() -> Path:
@@ -196,11 +200,15 @@ def main() -> int:
         logging.warning("Bazel is required! Please install Bazel first.")
         return 1
 
-    if args.generate_launch_json:
-        update_launch_json(args.bazel_pattern, get_workspace_root() / ".vscode" / "launch.json", args.force)
+    vscode_dir = get_workspace_root() / ".vscode"
 
-        logging.info("You can now run the debug target(s) in VS Code.")
-        print_build_reminder(args.bazel_pattern)
+    if args.generate_launch_json:
+        if update_launch_json(args.bazel_pattern, vscode_dir / "launch.json", args.force):
+            logging.info("You can now run the debug target(s) in VS Code.")
+            print_build_reminder(args.bazel_pattern)
+        else:
+            logging.error("No executable targets were found, no `launch.json` file was generated.")
+
     return 0
 
 
