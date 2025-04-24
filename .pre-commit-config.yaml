@@ -138,7 +138,7 @@ repos:
     hooks:
       - id: yamlfmt
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.37.0
+    rev: v1.35.1 # Last version to support Python 3.8
     hooks:
       - id: yamllint
         args: [--strict]
