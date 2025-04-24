@@ -41,6 +41,12 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def run_bazel_command(command: str, *args: str) -> str:
+    cmd = ["bazel", command, "--ui_event_filters=-info", "--noshow_progress", *args]
+    logging.debug("Running command: %s", " ".join(cmd))
+    return subprocess.check_output(cmd).decode(sys.stdout.encoding)
+
+
 def is_executable_rule(kind: str, entity: str) -> bool:
     return entity == "rule" and kind in ["cc_binary", "cc_test"]
 
@@ -58,9 +64,7 @@ def confirm_if_too_many_labels(labels: set[str], force: bool) -> None:  # noqa: 
 
 
 def query_bazel_for_labels(pattern: str) -> str:
-    cmd = ["bazel", "query", f"'{pattern}'", "--output=label_kind"]
-    logging.info("Running command: %s", " ".join(cmd))
-    return subprocess.check_output(cmd).decode(sys.stdout.encoding)
+    return run_bazel_command("query", f"'{pattern}'", "--output=label_kind")
 
 
 def get_label_from_bazel_query_line(line: str) -> str | None:
@@ -166,9 +170,7 @@ def update_launch_json(bazel_patterns: list[str], config_location: Path, force: 
 
 
 def get_workspace_root() -> Path:
-    cmd = ["bazel", "info", "workspace"]
-    logging.info("Running command: %s", " ".join(cmd))
-    return Path(subprocess.check_output(cmd).decode(sys.stdout.encoding).strip())
+    return Path(run_bazel_command("info", "workspace").strip())
 
 
 def main() -> int:
