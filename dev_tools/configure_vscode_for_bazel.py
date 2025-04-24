@@ -157,9 +157,9 @@ def save_new_config(new_config: dict[str, Any], config_location: Path, force: bo
 
 
 def print_build_reminder(bazel_patterns: list[str]) -> None:
-    infix = "eg. " if len(bazel_patterns) > 1 else ""
+    infix = " eg.:" if len(bazel_patterns) > 1 else ":"
     logging.info(
-        "Remember to build the target(s) beforehand with %s `bazel build --config=debug %s`.", infix, bazel_patterns[0]
+        "Remember to build the target(s) beforehand with%s\n\nbazel build --config=debug %s", infix, bazel_patterns[0]
     )
 
 
