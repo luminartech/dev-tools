@@ -15,7 +15,6 @@ from dev_tools.configure_vscode_for_bazel import (
     get_new_launch_config,
     get_path_from_label,
     parse_arguments,
-    quit_if_no_labels_found,
     save_new_launch_config,
 )
 
@@ -96,7 +95,3 @@ def test__parse_arguments__for_two_patterns__returns_parsed_values() -> None:
 
 def test__parse_arguments__for_no_patterns__raises_error() -> None:
     assert pytest.raises(SystemExit, parse_arguments, [])
-
-
-def test__quit_if_no_labels_found__for_no_labels__raises_error() -> None:
-    assert pytest.raises(SystemExit, quit_if_no_labels_found, set())
