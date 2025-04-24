@@ -36,6 +36,11 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="Show verbose output.",
     )
     parser.add_argument(
+        "--build",
+        action="store_true",
+        help="Run recommended bazel build/run actions.",
+    )
+    parser.add_argument(
         "--generate-launch-json",
         action="store_true",
         help="Generate the `launch.json` file.",
@@ -247,7 +252,11 @@ def main() -> int:
         recommended_actions.append(("bazel", "build", *args.bazel_pattern))
         recommended_actions.append(("bazel", "run", "//.vscode:refresh_compile_commands"))
 
-    logging.info("Remember to build the target(s) with:\n\n%s", "\n".join(" ".join(c) for c in recommended_actions))
+    if args.build:
+        for _bazel, *command in recommended_actions:
+            run_bazel_command(*command)
+
+    logging.info("Remember to re-build the target(s) with:\n\n%s", "\n".join(" ".join(c) for c in recommended_actions))
 
     return 0
 
