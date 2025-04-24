@@ -3,6 +3,7 @@
 """Generate VSCode configuration for selected Bazel C++ targets.
 
 - generate launch.json debug configurations
+- generate `compilation_commands.json`
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ import logging
 import shutil
 import subprocess
 import sys
+import textwrap
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -45,6 +47,18 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="Do not generate the `launch.json` file.",
     )
     parser.set_defaults(generate_launch_json=True)
+    parser.add_argument(
+        "--generate-compile-commands",
+        action="store_true",
+        help="Generate the `compile_commands.json` file.",
+    )
+    parser.add_argument(
+        "--no-generate-compile-commands",
+        dest="generate_compile_commands",
+        action="store_false",
+        help="Do not generate the `compile_commands.json` file.",
+    )
+    parser.set_defaults(generate_compile_commands=True)
     parser.add_argument(
         "-f",
         "--force",
@@ -187,6 +201,28 @@ def update_launch_json(bazel_patterns: list[str], config_location: Path, force: 
     return False
 
 
+def update_cc_build_file(bazel_patterns: list[str], config_location: Path, force: bool) -> bool:  # noqa: FBT001
+    if confirm_config_overwrite(config_location, force):
+        sep = "," + "\n" + " " * 24
+        config_location.write_text(
+            textwrap.dedent(
+                f"""
+                load("@hedron_compile_commands//:refresh_compile_commands.bzl", "refresh_compile_commands")
+
+                refresh_compile_commands(
+                    name = "refresh_compile_commands",
+                    targets = [
+                        {sep.join(repr(p) for p in bazel_patterns)}
+                    ],
+                )
+                """
+            ).strip()
+        )
+        logging.info("Saved new BUILD.bazel to %s", config_location)
+        return True
+    return False
+
+
 def get_workspace_root() -> Path:
     return Path(run_bazel_command("info", "workspace").strip())
 
@@ -208,6 +244,10 @@ def main() -> int:
             print_build_reminder(args.bazel_pattern)
         else:
             logging.error("No executable targets were found, no `launch.json` file was generated.")
+
+    if args.generate_compile_commands:
+        if update_cc_build_file(args.bazel_pattern, vscode_dir / "BUILD.bazel", args.force):
+            logging.info("You can now generate the `compile_commands.json` file.")
 
     return 0
 
