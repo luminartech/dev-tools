@@ -187,13 +187,6 @@ def save_new_launch_config(new_config: dict[str, Any], config_location: Path, fo
     return False
 
 
-def print_build_reminder(bazel_patterns: list[str]) -> None:
-    infix = " eg.:" if len(bazel_patterns) > 1 else ":"
-    logging.info(
-        "Remember to build the target(s) beforehand with%s\n\nbazel build --config=debug %s", infix, bazel_patterns[0]
-    )
-
-
 def update_launch_json(bazel_patterns: list[str], config_location: Path, force: bool) -> bool:  # noqa: FBT001
     if executable_labels := find_executable_labels(bazel_patterns, force):
         new_config = get_new_launch_config(executable_labels)
@@ -238,16 +231,23 @@ def main() -> int:
 
     vscode_dir = get_workspace_root() / ".vscode"
 
+    recommended_actions = []
+
     if args.generate_launch_json:
         if update_launch_json(args.bazel_pattern, vscode_dir / "launch.json", args.force):
             logging.info("You can now run the debug target(s) in VS Code.")
-            print_build_reminder(args.bazel_pattern)
+            recommended_actions.append(("bazel", "build", "--config=debug", *args.bazel_pattern))
         else:
             logging.error("No executable targets were found, no `launch.json` file was generated.")
 
-    if args.generate_compile_commands:
-        if update_cc_build_file(args.bazel_pattern, vscode_dir / "BUILD.bazel", args.force):
-            logging.info("You can now generate the `compile_commands.json` file.")
+    if args.generate_compile_commands and update_cc_build_file(
+        args.bazel_pattern, vscode_dir / "BUILD.bazel", args.force
+    ):
+        logging.info("You can now generate the `compile_commands.json` file.")
+        recommended_actions.append(("bazel", "build", *args.bazel_pattern))
+        recommended_actions.append(("bazel", "run", "//.vscode:refresh_compile_commands"))
+
+    logging.info("Remember to build the target(s) with:\n\n%s", "\n".join(" ".join(c) for c in recommended_actions))
 
     return 0
 
