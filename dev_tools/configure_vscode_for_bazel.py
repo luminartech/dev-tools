@@ -125,7 +125,7 @@ def get_path_from_label(bazel_label: str) -> str:
     return remove_prefix_if_present(bazel_label, "//").replace(":", "/")
 
 
-def get_new_config(executable_labels: set[str]) -> dict[str, Any]:
+def get_new_launch_config(executable_labels: set[str]) -> dict[str, Any]:
     return {
         "version": "0.2.0",
         "configurations": [
@@ -158,7 +158,7 @@ def get_new_config(executable_labels: set[str]) -> dict[str, Any]:
     }
 
 
-def save_new_config(new_config: dict[str, Any], config_location: Path, force: bool) -> None:  # noqa: FBT001
+def save_new_launch_config(new_config: dict[str, Any], config_location: Path, force: bool) -> None:  # noqa: FBT001
     """Serializes the new_configuration to config_location.
 
     If the file already exists, asks for confirmation, unless force is set.
@@ -179,8 +179,8 @@ def print_build_reminder(bazel_patterns: list[str]) -> None:
 
 def update_launch_json(bazel_patterns: list[str], config_location: Path, force: bool) -> None:  # noqa: FBT001
     executable_labels = find_executable_labels(bazel_patterns, force)
-    new_config = get_new_config(executable_labels)
-    save_new_config(new_config, config_location, force)
+    new_config = get_new_launch_config(executable_labels)
+    save_new_launch_config(new_config, config_location, force)
 
 
 def get_workspace_root() -> Path:
