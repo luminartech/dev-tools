@@ -73,6 +73,20 @@ date
     assert main([str(file)]) == 0
 
 
+def test_pass_for_bash_file_from_suffix(fs: FakeFilesystem) -> None:
+    file = "sh_file.bash"
+    fs.create_file(
+        file,
+        contents="""
+set -euxo pipefail
+date
+""",
+        st_mode=EXECUTABLE_FILE,
+    )
+
+    assert main([str(file)]) == 0
+
+
 def test_pass_for_non_executable_file(fs: FakeFilesystem) -> None:
     file = "sh_file.sh"
     fs.create_file(
@@ -125,6 +139,19 @@ def test_fail_for_invalid_file(fs: FakeFilesystem) -> None:
     fs.create_file(
         file,
         contents="""#!/usr/bin/bash
+date
+""",
+        st_mode=EXECUTABLE_FILE,
+    )
+
+    assert main([str(file)]) == 1
+
+
+def test_fail_for_invalid_bash_file_from_suffix(fs: FakeFilesystem) -> None:
+    file = "sh_file.bash"
+    fs.create_file(
+        file,
+        contents="""
 date
 """,
         st_mode=EXECUTABLE_FILE,
