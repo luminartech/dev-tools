@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import os
+import platform
 import re
 import sys
 from typing import TYPE_CHECKING, Sequence
@@ -11,6 +13,10 @@ from dev_tools.git_hook_utils import parse_arguments
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+
+def _is_executable(filename: Path) -> bool:
+    return platform.system() in ("Linux", "Darwin") and filename.is_file() and os.access(filename, os.X_OK)
 
 
 def _sets_options_or_is_nolint(line: str, expected_options: str) -> bool:
@@ -28,20 +34,24 @@ def _does_shebang_match(program: str, first_line: str) -> bool:
     return match is not None
 
 
-def _separate_bash_from_sh_files(filenames: Sequence[Path]) -> tuple[list[Path], list[Path]]:
+def _separate_bash_from_sh_files(filenames: Sequence[Path]) -> tuple[bool, list[Path], list[Path]]:
     bash_files = []
     sh_files = []
+    all_valid = True
     for filename in filenames:
         first_line = filename.open().readline()
         if _does_shebang_match("bash", first_line):
             bash_files.append(filename)
         elif _does_shebang_match("sh", first_line):
             sh_files.append(filename)
+        elif not _is_executable(filename):
+            pass  # ignore non-executable files as we don't enforce a shebang for them
         else:
+            all_valid = False
             msg = f"Unknown shell in {filename}: {first_line}. Only use this hook in combination with 'check-executables-have-shebangs' from https://github.com/pre-commit/pre-commit-hooks"
-            raise ValueError(msg)
+            print(msg, file=sys.stderr)
 
-    return bash_files, sh_files
+    return all_valid, bash_files, sh_files
 
 
 def _are_shell_files_valid(shell_files: list[Path], expected_options: str) -> bool:
@@ -55,8 +65,8 @@ def _are_shell_files_valid(shell_files: list[Path], expected_options: str) -> bo
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_arguments(argv)
 
-    bash_files, sh_files = _separate_bash_from_sh_files(args.filenames)
-    are_all_files_valid = _are_shell_files_valid(bash_files, "set -euxo pipefail")
+    are_all_files_valid, bash_files, sh_files = _separate_bash_from_sh_files(args.filenames)
+    are_all_files_valid &= _are_shell_files_valid(bash_files, "set -euxo pipefail")
     are_all_files_valid &= _are_shell_files_valid(sh_files, "set -eux")
 
     return 0 if are_all_files_valid else 1
