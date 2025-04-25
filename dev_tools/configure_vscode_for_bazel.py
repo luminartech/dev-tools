@@ -51,6 +51,7 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_false",
         help="Do not generate the `launch.json` file.",
     )
+    # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
     parser.set_defaults(generate_launch_json=True)
     parser.add_argument(
         "--generate-compile-commands",
@@ -63,6 +64,7 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_false",
         help="Do not generate the `compile_commands.json` file.",
     )
+    # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
     parser.set_defaults(generate_compile_commands=True)
     parser.add_argument(
         "-f",
