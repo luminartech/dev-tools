@@ -40,7 +40,7 @@ def _separate_bash_from_sh_files(filenames: Sequence[Path]) -> tuple[bool, list[
     all_valid = True
     for filename in filenames:
         first_line = filename.open().readline()
-        if _does_shebang_match("bash", first_line):
+        if _does_shebang_match("bash", first_line) or filename.suffix == ".bash":
             bash_files.append(filename)
         elif _does_shebang_match("sh", first_line):
             sh_files.append(filename)
@@ -48,7 +48,7 @@ def _separate_bash_from_sh_files(filenames: Sequence[Path]) -> tuple[bool, list[
             pass  # ignore non-executable files as we don't enforce a shebang for them
         else:
             all_valid = False
-            msg = f"Unknown shell in {filename}: {first_line}. Only use this hook in combination with 'check-executables-have-shebangs' from https://github.com/pre-commit/pre-commit-hooks"
+            msg = f"Unknown shell in {filename}: {first_line.strip()}. Only use this hook in combination with 'check-executables-have-shebangs' from https://github.com/pre-commit/pre-commit-hooks"
             print(msg, file=sys.stderr)
 
     return all_valid, bash_files, sh_files
