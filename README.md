@@ -56,7 +56,8 @@ To generate `compile_commands.json` for a defined set of targets, run
 configure-vscode-for-bazel --generate-compile-commands --build //path/to/your/target/...
 ```
 
-This will create a `.vscode/BUILD.bazel` file and run the `bazel-compile-commands-extractor` to create a `compile_commands.json` in for workspace root. See [the usage documentation](https://github.com/hedronvision/bazel-compile-commands-extractor?tab=readme-ov-file#usage) for more information.
+This will create a `.vscode/BUILD.bazel` file and run the `bazel-compile-commands-extractor` to create a `compile_commands.json` in for workspace root.
+See [the usage documentation](https://github.com/hedronvision/bazel-compile-commands-extractor?tab=readme-ov-file#usage) for more information.
 
 ### Whoowns
 
