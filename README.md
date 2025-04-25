@@ -35,7 +35,8 @@ These tools are used to help developers in their day-to-day tasks.
 
 ### Configure VS Code for Bazel
 
-If you want to work with C++ Bazel targets in VS Code, you can use `configure-vscode-for-bazel` to generate VS Code configuration. This tool supports generating:
+If you want to work with C++ Bazel targets in VS Code, you can use `configure-vscode-for-bazel` to generate a VS Code configuration.
+This tool supports generating:
 
 - a `.vscode/launch.json` file that contains selected targets for debugging in VS Code or
 - a `compile_commands.json` file using [bazel-compile-commands-extractor](https://github.com/hedronvision/bazel-compile-commands-extractor) for selected targets
