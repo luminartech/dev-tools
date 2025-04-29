@@ -51,6 +51,14 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_false",
         help="Do not generate the `launch.json` file.",
     )
+    parser.add_argument(
+        "--additional-debug-arg",
+        type=str,
+        nargs="*",
+        default=[],
+        action="extend",
+        help="Additional arguments to pass to the bazel build command when building targets for the `launch.json`.",
+    )
     # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
     parser.set_defaults(generate_launch_json=True)
     parser.add_argument(
@@ -71,6 +79,14 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--force",
         action="store_true",
         help="Don't ask for confirmation.",
+    )
+    parser.add_argument(
+        "--additional-compile-commands-arg",
+        type=str,
+        nargs="*",
+        default=[],
+        action="extend",
+        help="Additional arguments to pass to the `compile_commands.json` refresh template.",
     )
 
     return parser.parse_args(argv)
@@ -201,9 +217,10 @@ def update_launch_json(bazel_patterns: list[str], config_location: Path, force: 
     return False
 
 
-def update_cc_build_file(bazel_patterns: list[str], config_location: Path, force: bool) -> bool:  # noqa: FBT001
+def update_cc_build_file(bazel_patterns: list[str], bazel_args: list[str], config_location: Path, force: bool) -> bool:  # noqa: FBT001
     if confirm_config_overwrite(config_location, force):
-        sep = "," + "\n" + " " * 24
+        args = " ".join(bazel_args)
+        targets = dict.fromkeys(bazel_patterns, args)
         config_location.write_text(
             textwrap.dedent(
                 f"""
@@ -211,9 +228,7 @@ def update_cc_build_file(bazel_patterns: list[str], config_location: Path, force
 
                 refresh_compile_commands(
                     name = "refresh_compile_commands",
-                    targets = [
-                        {sep.join(repr(p) for p in bazel_patterns)}
-                    ],
+                    targets = {targets},
                 )
                 """
             ).strip()
@@ -243,15 +258,15 @@ def main() -> int:
     if args.generate_launch_json:
         if update_launch_json(args.bazel_pattern, vscode_dir / "launch.json", args.force):
             logging.info("You can now run the debug target(s) in VS Code.")
-            recommended_actions.append(("bazel", "build", "--config=debug", *args.bazel_pattern))
+            recommended_actions.append(("bazel", "build", *args.additional_debug_arg, *args.bazel_pattern))
         else:
             logging.error("No executable targets were found, no `launch.json` file was generated.")
 
     if args.generate_compile_commands and update_cc_build_file(
-        args.bazel_pattern, vscode_dir / "BUILD.bazel", args.force
+        args.bazel_pattern, args.additional_compile_commands_arg, vscode_dir / "BUILD.bazel", args.force
     ):
         logging.info("You can now generate the `compile_commands.json` file.")
-        recommended_actions.append(("bazel", "build", *args.bazel_pattern))
+        recommended_actions.append(("bazel", "build", *args.additional_compile_commands_arg, *args.bazel_pattern))
         recommended_actions.append(("bazel", "run", "//.vscode:refresh_compile_commands"))
 
     if args.build:
