@@ -206,8 +206,3 @@ repos:
     hooks:
       - id: vulture
         pass_filenames: true
-# Enable once https://github.com/renovatebot/pre-commit-hooks/issues/2460 is resolved
-#   - repo: https://github.com/renovatebot/pre-commit-hooks
-#     rev: 38.77.3
-#     hooks:
-#       - id: renovate-config-validator
