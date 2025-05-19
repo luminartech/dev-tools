@@ -199,7 +199,7 @@ repos:
     rev: v0.45.0
     hooks:
       - id: markdownlint
-        language_version: 20.19.2
+        language_version: 22.14.0
         args: ["--dot", "--fix"]
   - repo: https://github.com/jendrikseipp/vulture
     rev: v2.14
