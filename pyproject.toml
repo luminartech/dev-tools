@@ -8,9 +8,6 @@ recursive = true
 wrap-summaries = 88
 wrap-descriptions = 81
 
-[tool.flake8]
-max-line-length = 120
-
 [tool.mypy]
 check_untyped_defs = true
 disallow_incomplete_defs = true
@@ -57,22 +54,6 @@ configure-vscode-for-bazel = "dev_tools.configure_vscode_for_bazel:main"
 generate-hook-docs = "dev_tools.generate_hook_docs:main"
 sync-vscode-config = "dev_tools.sync_vscode_config:main"
 whoowns = "dev_tools.find_owner:main"
-
-[tool.pylint.FORMAT]
-max-line-length = 120
-
-[tool.pylint.MASTER]
-# Add files or directories to the blacklist. They should be base names, not paths.
-ignore = ["venv"]
-
-[tool.pylint."MESSAGES CONTROL"]
-# Only show warnings with the listed confidence levels. Leave empty to show
-# all. Valid levels: HIGH, INFERENCE, INFERENCE_FAILURE, UNDEFINED
-confidence = ""
-disable = [
-  "missing-function-docstring",
-  "import-error" # disabled since pre-commit runs pylint in a separate venv
-]
 
 [tool.pytest.ini_options]
 addopts = "--cov-report term-missing --cov=dev_tools -vv"
