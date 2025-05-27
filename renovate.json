@@ -38,8 +38,6 @@
     {
       "groupName": "{{packageFileDir}} dependency updates",
       "matchManagers": [
-        "poetry",
-        "pip_requirements",
         "pre-commit"
       ]
     }
