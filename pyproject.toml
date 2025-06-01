@@ -45,7 +45,7 @@ pyjson5 = ">=1.6.8"
 pytest = "==8.3.5"
 pytest-cov = "==5.0.0"
 pyfakefs = "==5.8.0"
-ruamel-yaml = "==0.18.10"
+ruamel-yaml = "==0.18.12"
 
 [tool.poetry.scripts]
 check-jira-reference-in-todo = "dev_tools.check_jira_reference_in_todo:main"
