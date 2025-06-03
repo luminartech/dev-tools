@@ -92,8 +92,24 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def run_bazel_command(command: str, *args: str) -> str:
-    cmd = ["bazel", command, "--ui_event_filters=-info", "--noshow_progress", *args]
+def build_bazel_command(command: str, *args: str, verbose: bool = False) -> list[str]:
+    quiet_args = [] if verbose else ["--ui_event_filters=-info", "--noshow_progress"]
+    return ["bazel", command, *quiet_args, *args]
+
+
+def run_bazel_command(command: str, *args: str, verbose: bool = False) -> None:
+    """Run a Bazel command and check for exit code.
+
+    Output is forwarded to the console.
+    """
+    cmd = build_bazel_command(command, *args, verbose=verbose)
+    logging.debug("Running command: %s", " ".join(cmd))
+    subprocess.check_call(cmd)
+
+
+def run_bazel_command_output(command: str, *args: str) -> str:
+    """Run a Bazel command and return its output as a string."""
+    cmd = build_bazel_command(command, *args)
     logging.debug("Running command: %s", " ".join(cmd))
     return subprocess.check_output(cmd).decode(sys.stdout.encoding)
 
@@ -124,7 +140,7 @@ def confirm_config_overwrite(config_location: Path, force: bool) -> bool:  # noq
 
 
 def query_bazel_for_labels(pattern: str) -> str:
-    return run_bazel_command("query", f"'{pattern}'", "--output=label_kind")
+    return run_bazel_command_output("query", f"'{pattern}'", "--output=label_kind")
 
 
 def get_label_from_bazel_query_line(line: str) -> str | None:
@@ -239,7 +255,7 @@ def update_cc_build_file(bazel_patterns: list[str], bazel_args: list[str], confi
 
 
 def get_workspace_root() -> Path:
-    return Path(run_bazel_command("info", "workspace").strip())
+    return Path(run_bazel_command_output("info", "workspace").strip())
 
 
 def main() -> int:
@@ -271,7 +287,7 @@ def main() -> int:
 
     if args.build:
         for _bazel, *command in recommended_actions:
-            run_bazel_command(*command)
+            run_bazel_command(*command, verbose=args.verbose)
 
     logging.info("Remember to re-build the target(s) with:\n\n%s", "\n".join(" ".join(c) for c in recommended_actions))
 
