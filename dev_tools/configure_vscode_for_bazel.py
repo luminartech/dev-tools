@@ -21,6 +21,50 @@ from typing import Any, Sequence
 MAX_TARGETS_WITHOUT_CONFIRMATION = 20
 
 
+def add_run_and_debug_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--generate-launch-json",
+        action="store_true",
+        help="Generate the `launch.json` file containing gdb targets. This is the default.",
+    )
+    parser.add_argument(
+        "--no-generate-launch-json",
+        dest="generate_launch_json",
+        action="store_false",
+        help="Do not generate the `launch.json` file.",
+    )
+    # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
+    parser.set_defaults(generate_launch_json=True)
+
+    parser.add_argument(
+        "--generate-build-targets",
+        action="store_true",
+        help="Generate the `tasks.json` file containing build targets. If --generate-launch-json is set, the gdb targets will depend on the build targets. This is the default.",
+    )
+    parser.add_argument(
+        "--no-generate-build-targets",
+        dest="generate_build_targets",
+        action="store_false",
+        help="Do not generate the build targets in the `tasks.json` file.",
+    )
+    # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
+    parser.set_defaults(generate_build_targets=True)
+
+    parser.add_argument(
+        "--generate-compile-commands",
+        action="store_true",
+        help="Generate the `compile_commands.json` file. This is the default.",
+    )
+    parser.add_argument(
+        "--no-generate-compile-commands",
+        dest="generate_compile_commands",
+        action="store_false",
+        help="Do not generate the `compile_commands.json` file.",
+    )
+    # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
+    parser.set_defaults(generate_compile_commands=True)
+
+
 def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -40,40 +84,16 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Run recommended bazel build/run actions.",
     )
-    parser.add_argument(
-        "--generate-launch-json",
-        action="store_true",
-        help="Generate the `launch.json` file.",
-    )
-    parser.add_argument(
-        "--no-generate-launch-json",
-        dest="generate_launch_json",
-        action="store_false",
-        help="Do not generate the `launch.json` file.",
-    )
+
     parser.add_argument(
         "--additional-debug-arg",
         type=str,
         nargs="*",
         default=[],
         action="extend",
-        help="Additional arguments to pass to the bazel build command when building targets for the `launch.json`.",
+        help="Additional arguments to pass to the bazel build command when building targets for the `launch.json` and `tasks.json`.",
     )
-    # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
-    parser.set_defaults(generate_launch_json=True)
-    parser.add_argument(
-        "--generate-compile-commands",
-        action="store_true",
-        help="Generate the `compile_commands.json` file.",
-    )
-    parser.add_argument(
-        "--no-generate-compile-commands",
-        dest="generate_compile_commands",
-        action="store_false",
-        help="Do not generate the `compile_commands.json` file.",
-    )
-    # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
-    parser.set_defaults(generate_compile_commands=True)
+
     parser.add_argument(
         "-f",
         "--force",
@@ -88,6 +108,8 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="extend",
         help="Additional arguments to pass to the `compile_commands.json` refresh template.",
     )
+
+    add_run_and_debug_arguments(parser)
 
     return parser.parse_args(argv)
 
@@ -214,7 +236,33 @@ def get_new_launch_config(executable_labels: set[str]) -> dict[str, Any]:
     }
 
 
-def save_new_launch_config(new_config: dict[str, Any], config_location: Path, force: bool) -> bool:  # noqa: FBT001
+def get_new_tasks_config(executable_labels: set[str], additional_debug_args: list[str]) -> dict[str, Any]:
+    return {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": f"(bazel build): {label}",
+                "type": "process",
+                "command": "bazel",
+                "group": {
+                    "kind": "build",
+                },
+                "args": [
+                    "build",
+                    *additional_debug_args,
+                    label,
+                ],
+                "presentation": {
+                    "clear": True,
+                },
+                "detail": f"bazel build {' '.join(additional_debug_args)}",
+            }
+            for label in executable_labels
+        ],
+    }
+
+
+def save_new_json_config(new_config: dict[str, Any], config_location: Path, force: bool) -> bool:  # noqa: FBT001
     """Serializes the new_configuration to config_location.
 
     If the file already exists, asks for confirmation, unless force is set.
@@ -226,11 +274,20 @@ def save_new_launch_config(new_config: dict[str, Any], config_location: Path, fo
     return False
 
 
-def update_launch_json(bazel_patterns: list[str], config_location: Path, force: bool) -> bool:  # noqa: FBT001
-    if executable_labels := find_executable_labels(bazel_patterns, force):
-        new_config = get_new_launch_config(executable_labels)
-        return save_new_launch_config(new_config, config_location, force)
-    return False
+def update_launch_json(executable_labels: set[str], config_location: Path, force: bool) -> bool:  # noqa: FBT001
+    if not executable_labels:
+        return False
+    new_config = get_new_launch_config(executable_labels)
+    return save_new_json_config(new_config, config_location, force)
+
+
+def update_tasks_json(
+    executable_labels: set[str], config_location: Path, additional_debug_args: list[str], *, force: bool = False
+) -> bool:
+    if not executable_labels:
+        return False
+    new_config = get_new_tasks_config(executable_labels, additional_debug_args)
+    return save_new_json_config(new_config, config_location, force)
 
 
 def update_cc_build_file(bazel_patterns: list[str], bazel_args: list[str], config_location: Path, force: bool) -> bool:  # noqa: FBT001
@@ -268,13 +325,28 @@ def main() -> int:
         return 1
 
     vscode_dir = get_workspace_root() / ".vscode"
+    if not vscode_dir.exists():
+        logging.info("Creating .vscode directory in the workspace root.")
+        vscode_dir.mkdir(parents=True, exist_ok=True)
 
     recommended_actions = []
 
+    if args.generate_launch_json or args.generate_build_targets:
+        executable_labels = find_executable_labels(args.bazel_pattern, args.force)
+
+    if args.generate_build_targets:
+        if update_tasks_json(executable_labels, vscode_dir / "tasks.json", args.additional_debug_arg, force=args.force):
+            logging.info(
+                "Build targets were generated in `tasks.json`. Consider using Task: Run Build Task from the Command Palette."
+            )
+        else:
+            logging.error("No executable targets were found, no `tasks.json` file was generated.")
+
     if args.generate_launch_json:
-        if update_launch_json(args.bazel_pattern, vscode_dir / "launch.json", args.force):
+        if update_launch_json(executable_labels, vscode_dir / "launch.json", args.force):
             logging.info("You can now run the debug target(s) in VS Code.")
-            recommended_actions.append(("bazel", "build", *args.additional_debug_arg, *args.bazel_pattern))
+            if not args.generate_build_targets:
+                recommended_actions.append(("bazel", "build", *args.additional_debug_arg, *args.bazel_pattern))
         else:
             logging.error("No executable targets were found, no `launch.json` file was generated.")
 
@@ -289,7 +361,10 @@ def main() -> int:
         for _bazel, *command in recommended_actions:
             run_bazel_command(*command, verbose=args.verbose)
 
-    logging.info("Remember to re-build the target(s) with:\n\n%s", "\n".join(" ".join(c) for c in recommended_actions))
+    if recommended_actions and not args.build:
+        logging.info(
+            "Remember to re-build the target(s) with:\n\n%s", "\n".join(" ".join(c) for c in recommended_actions)
+        )
 
     return 0
 
