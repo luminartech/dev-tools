@@ -85,13 +85,13 @@ def test__get_new_tasks_config__for_one_label_and_additional_args__returns_corre
     assert config["tasks"][0]["args"] == ["build", "--config=dbg", "//foo/bar:test1"]
 
 
-def test__save_new_launch_config__when_it_doesnt_exist__creates_new_file(fs: FakeFilesystem) -> None:
+def test__save_new_json_config__when_it_doesnt_exist__creates_new_file(fs: FakeFilesystem) -> None:
     tmp_file = Path(fs.create_file("launch.json").path)
     save_new_json_config({"configurations": []}, config_location=tmp_file, force=True)
     assert "configurations" in tmp_file.read_text()
 
 
-def test__save_new_launch_config__when_it_exists__overwrites_it(fs: FakeFilesystem) -> None:
+def test__save_new_json_config__when_it_exists__overwrites_it(fs: FakeFilesystem) -> None:
     tmp_file = Path(fs.create_file("launch.json").path)
     tmp_file.write_text('{"old_content": []}')
     save_new_json_config({"new_content": []}, config_location=tmp_file, force=True)
