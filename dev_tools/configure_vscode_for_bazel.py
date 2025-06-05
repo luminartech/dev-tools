@@ -203,7 +203,20 @@ def get_path_from_label(bazel_label: str) -> str:
     return remove_prefix_if_present(bazel_label, "//").replace(":", "/")
 
 
-def get_new_launch_config(executable_labels: set[str]) -> dict[str, Any]:
+def get_build_task_label(bazel_label: str) -> str:
+    """Convert a Bazel label to a VSCode task label/name."""
+    return f"(bazel): {bazel_label}"
+
+
+def try_get_task_dependency(label: str, *, task_exists: bool = False) -> dict[str, Any]:
+    """Convert a Bazel label to a VSCode pre-requisite task reference, as required by
+    launch.json configuration."""
+    if not task_exists:
+        return {}
+    return {"preLaunchTask": get_build_task_label(label)}
+
+
+def get_new_launch_config(executable_labels: set[str], *, build_tasks_exist: bool = False) -> dict[str, Any]:
     return {
         "version": "0.2.0",
         "configurations": [
@@ -230,18 +243,21 @@ def get_new_launch_config(executable_labels: set[str]) -> dict[str, Any]:
                     "binary_path": get_path_from_label(label),
                     "generated_by": "configure-vscode-for-bazel",
                 },
+                **try_get_task_dependency(label, task_exists=build_tasks_exist),
             }
             for label in executable_labels
         ],
     }
 
 
-def get_new_tasks_config(executable_labels: set[str], additional_debug_args: list[str]) -> dict[str, Any]:
+def get_new_tasks_config(executable_labels: set[str], additional_debug_args: list[str] | None = None) -> dict[str, Any]:
+    if additional_debug_args is None:
+        additional_debug_args = []
     return {
         "version": "2.0.0",
         "tasks": [
             {
-                "label": f"(bazel build): {label}",
+                "label": get_build_task_label(label),
                 "type": "process",
                 "command": "bazel",
                 "group": {
@@ -255,7 +271,7 @@ def get_new_tasks_config(executable_labels: set[str], additional_debug_args: lis
                 "presentation": {
                     "clear": True,
                 },
-                "detail": f"bazel build {' '.join(additional_debug_args)}",
+                "detail": f"bazel build {' '.join(additional_debug_args)} {label}",
             }
             for label in executable_labels
         ],
@@ -274,10 +290,16 @@ def save_new_json_config(new_config: dict[str, Any], config_location: Path, forc
     return False
 
 
-def update_launch_json(executable_labels: set[str], config_location: Path, force: bool) -> bool:  # noqa: FBT001
+def update_launch_json(
+    executable_labels: set[str],
+    config_location: Path,
+    force: bool,  # noqa: FBT001
+    *,
+    are_build_targets_generated: bool = False,
+) -> bool:
     if not executable_labels:
         return False
-    new_config = get_new_launch_config(executable_labels)
+    new_config = get_new_launch_config(executable_labels, build_tasks_exist=are_build_targets_generated)
     return save_new_json_config(new_config, config_location, force)
 
 
@@ -353,7 +375,12 @@ def handle_launch_json_generation(
     args: argparse.Namespace, executable_labels: set[str], vscode_dir: Path, recommended_actions: list[tuple[str, ...]]
 ) -> None:
     if args.generate_launch_json:
-        success = update_launch_json(executable_labels, vscode_dir / "launch.json", args.force)
+        success = update_launch_json(
+            executable_labels,
+            vscode_dir / "launch.json",
+            args.force,
+            are_build_targets_generated=args.generate_build_targets,
+        )
         if success:
             logging.info("You can now run the debug target(s) in VS Code.")
             if not args.generate_build_targets:

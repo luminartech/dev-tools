@@ -13,6 +13,7 @@ from dev_tools.configure_vscode_for_bazel import (
     find_executable_labels,
     get_label_from_bazel_query_line,
     get_new_launch_config,
+    get_new_tasks_config,
     get_path_from_label,
     parse_arguments,
     save_new_json_config,
@@ -70,6 +71,18 @@ def test__get_new_launch_config__for_one_label__returns_correct_variables() -> N
     assert config["configurations"][0]["cwd"] == "${workspaceFolder}"
     assert config["configurations"][0]["variables"]["generated_by"] == "configure-vscode-for-bazel"
     assert config["configurations"][0]["program"].endswith(r"bazel-out/k8-dbg/bin/${binary_path}")
+
+
+def test__get_new_tasks_config__for_one_label__returns_correct_command_line() -> None:
+    config = get_new_tasks_config({"//foo/bar:test1"})
+    assert config["tasks"][0]["command"] == "bazel"
+    assert config["tasks"][0]["args"] == ["build", "//foo/bar:test1"]
+
+
+def test__get_new_tasks_config__for_one_label_and_additional_args__returns_correct_command_line() -> None:
+    config = get_new_tasks_config({"//foo/bar:test1"}, ["--config=dbg"])
+    assert config["tasks"][0]["command"] == "bazel"
+    assert config["tasks"][0]["args"] == ["build", "--config=dbg", "//foo/bar:test1"]
 
 
 def test__save_new_launch_config__when_it_doesnt_exist__creates_new_file(fs: FakeFilesystem) -> None:
