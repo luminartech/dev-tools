@@ -249,26 +249,27 @@ def get_new_launch_config(executable_labels: set[str], *, build_tasks_exist: boo
     }
 
 
+def get_new_task_config(label: str, additional_debug_args: list[str] | None = None) -> dict[str, Any]:
+    args = ["build", *(additional_debug_args or []), label]
+    return {
+        "label": get_build_task_label(label),
+        "type": "process",
+        "command": "bazel",
+        "group": {
+            "kind": "build",
+        },
+        "args": args,
+        "presentation": {
+            "clear": True,
+        },
+        "detail": f"bazel {' '.join(args)}",
+    }
+
+
 def get_new_tasks_config(executable_labels: set[str], additional_debug_args: list[str] | None = None) -> dict[str, Any]:
-    args = [build, *(additional_debug_args or []), label]
     return {
         "version": "2.0.0",
-        "tasks": [
-            {
-                "label": get_build_task_label(label),
-                "type": "process",
-                "command": "bazel",
-                "group": {
-                    "kind": "build",
-                },
-                "args": args,
-                "presentation": {
-                    "clear": True,
-                },
-                "detail": f"bazel {' '.join(args)}",
-            }
-            for label in executable_labels
-        ],
+        "tasks": [get_new_task_config(label, additional_debug_args) for label in executable_labels],
     }
 
 
