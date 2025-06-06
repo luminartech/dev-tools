@@ -21,6 +21,51 @@ from typing import Any, Sequence
 MAX_TARGETS_WITHOUT_CONFIRMATION = 20
 
 
+def add_run_and_debug_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
+    parser.add_argument(
+        "--generate-launch-json",
+        action="store_true",
+        help="Generate the `launch.json` file containing gdb targets. This is the default.",
+    )
+    parser.add_argument(
+        "--no-generate-launch-json",
+        dest="generate_launch_json",
+        action="store_false",
+        help="Do not generate the `launch.json` file.",
+    )
+    # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
+    parser.set_defaults(generate_launch_json=True)
+
+    parser.add_argument(
+        "--generate-build-targets",
+        action="store_true",
+        help="Generate the `tasks.json` file containing build targets. If --generate-launch-json is set, the gdb targets will depend on the build targets. This is the default.",
+    )
+    parser.add_argument(
+        "--no-generate-build-targets",
+        dest="generate_build_targets",
+        action="store_false",
+        help="Do not generate the build targets in the `tasks.json` file.",
+    )
+    # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
+    parser.set_defaults(generate_build_targets=True)
+
+    parser.add_argument(
+        "--generate-compile-commands",
+        action="store_true",
+        help="Generate the `compile_commands.json` file. This is the default.",
+    )
+    parser.add_argument(
+        "--no-generate-compile-commands",
+        dest="generate_compile_commands",
+        action="store_false",
+        help="Do not generate the `compile_commands.json` file.",
+    )
+    # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
+    parser.set_defaults(generate_compile_commands=True)
+    return parser
+
+
 def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -40,40 +85,16 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Run recommended bazel build/run actions.",
     )
-    parser.add_argument(
-        "--generate-launch-json",
-        action="store_true",
-        help="Generate the `launch.json` file.",
-    )
-    parser.add_argument(
-        "--no-generate-launch-json",
-        dest="generate_launch_json",
-        action="store_false",
-        help="Do not generate the `launch.json` file.",
-    )
+
     parser.add_argument(
         "--additional-debug-arg",
         type=str,
         nargs="*",
         default=[],
         action="extend",
-        help="Additional arguments to pass to the bazel build command when building targets for the `launch.json`.",
+        help="Additional arguments to pass to the bazel build command when building targets for the `launch.json` and `tasks.json`.",
     )
-    # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
-    parser.set_defaults(generate_launch_json=True)
-    parser.add_argument(
-        "--generate-compile-commands",
-        action="store_true",
-        help="Generate the `compile_commands.json` file.",
-    )
-    parser.add_argument(
-        "--no-generate-compile-commands",
-        dest="generate_compile_commands",
-        action="store_false",
-        help="Do not generate the `compile_commands.json` file.",
-    )
-    # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
-    parser.set_defaults(generate_compile_commands=True)
+
     parser.add_argument(
         "-f",
         "--force",
@@ -89,11 +110,29 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="Additional arguments to pass to the `compile_commands.json` refresh template.",
     )
 
+    parser = add_run_and_debug_arguments(parser)
+
     return parser.parse_args(argv)
 
 
-def run_bazel_command(command: str, *args: str) -> str:
-    cmd = ["bazel", command, "--ui_event_filters=-info", "--noshow_progress", *args]
+def build_bazel_command(command: str, *args: str, verbose: bool = False) -> list[str]:
+    quiet_args = [] if verbose else ["--ui_event_filters=-info", "--noshow_progress"]
+    return ["bazel", command, *quiet_args, *args]
+
+
+def run_bazel_command(command: str, *args: str, verbose: bool = False) -> None:
+    """Run a Bazel command and check for exit code.
+
+    Output is forwarded to the console.
+    """
+    cmd = build_bazel_command(command, *args, verbose=verbose)
+    logging.debug("Running command: %s", " ".join(cmd))
+    subprocess.check_call(cmd)
+
+
+def run_bazel_command_output(command: str, *args: str) -> str:
+    """Run a Bazel command and return its output as a string."""
+    cmd = build_bazel_command(command, *args)
     logging.debug("Running command: %s", " ".join(cmd))
     return subprocess.check_output(cmd).decode(sys.stdout.encoding)
 
@@ -124,7 +163,7 @@ def confirm_config_overwrite(config_location: Path, force: bool) -> bool:  # noq
 
 
 def query_bazel_for_labels(pattern: str) -> str:
-    return run_bazel_command("query", f"'{pattern}'", "--output=label_kind")
+    return run_bazel_command_output("query", f"'{pattern}'", "--output=label_kind")
 
 
 def get_label_from_bazel_query_line(line: str) -> str | None:
@@ -165,7 +204,18 @@ def get_path_from_label(bazel_label: str) -> str:
     return remove_prefix_if_present(bazel_label, "//").replace(":", "/")
 
 
-def get_new_launch_config(executable_labels: set[str]) -> dict[str, Any]:
+def get_build_task_label(bazel_label: str) -> str:
+    """Convert a Bazel label to a VSCode task label/name."""
+    return f"(bazel): {bazel_label}"
+
+
+def try_get_task_dependency(label: str, *, task_exists: bool = False) -> dict[str, Any]:
+    """Convert a Bazel label to a VSCode pre-requisite task reference, as required by
+    launch.json configuration."""
+    return {"preLaunchTask": get_build_task_label(label)} if task_exists else {}
+
+
+def get_new_launch_config(executable_labels: set[str], *, build_tasks_exist: bool = False) -> dict[str, Any]:
     return {
         "version": "0.2.0",
         "configurations": [
@@ -192,13 +242,37 @@ def get_new_launch_config(executable_labels: set[str]) -> dict[str, Any]:
                     "binary_path": get_path_from_label(label),
                     "generated_by": "configure-vscode-for-bazel",
                 },
+                **try_get_task_dependency(label, task_exists=build_tasks_exist),
             }
             for label in executable_labels
         ],
     }
 
 
-def save_new_launch_config(new_config: dict[str, Any], config_location: Path, force: bool) -> bool:  # noqa: FBT001
+def get_new_tasks_config(executable_labels: set[str], additional_debug_args: list[str] | None = None) -> dict[str, Any]:
+    args = [build, *(additional_debug_args or []), label]
+    return {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": get_build_task_label(label),
+                "type": "process",
+                "command": "bazel",
+                "group": {
+                    "kind": "build",
+                },
+                "args": args,
+                "presentation": {
+                    "clear": True,
+                },
+                "detail": f"bazel {' '.join(args)}",
+            }
+            for label in executable_labels
+        ],
+    }
+
+
+def save_new_json_config(new_config: dict[str, Any], config_location: Path, force: bool) -> bool:  # noqa: FBT001
     """Serializes the new_configuration to config_location.
 
     If the file already exists, asks for confirmation, unless force is set.
@@ -210,11 +284,26 @@ def save_new_launch_config(new_config: dict[str, Any], config_location: Path, fo
     return False
 
 
-def update_launch_json(bazel_patterns: list[str], config_location: Path, force: bool) -> bool:  # noqa: FBT001
-    if executable_labels := find_executable_labels(bazel_patterns, force):
-        new_config = get_new_launch_config(executable_labels)
-        return save_new_launch_config(new_config, config_location, force)
-    return False
+def update_launch_json(
+    executable_labels: set[str],
+    config_location: Path,
+    force: bool,  # noqa: FBT001
+    *,
+    are_build_targets_generated: bool = False,
+) -> bool:
+    if not executable_labels:
+        return False
+    new_config = get_new_launch_config(executable_labels, build_tasks_exist=are_build_targets_generated)
+    return save_new_json_config(new_config, config_location, force)
+
+
+def update_tasks_json(
+    executable_labels: set[str], config_location: Path, additional_debug_args: list[str], *, force: bool = False
+) -> bool:
+    if not executable_labels:
+        return False
+    new_config = get_new_tasks_config(executable_labels, additional_debug_args)
+    return save_new_json_config(new_config, config_location, force)
 
 
 def update_cc_build_file(bazel_patterns: list[str], bazel_args: list[str], config_location: Path, force: bool) -> bool:  # noqa: FBT001
@@ -239,41 +328,108 @@ def update_cc_build_file(bazel_patterns: list[str], bazel_args: list[str], confi
 
 
 def get_workspace_root() -> Path:
-    return Path(run_bazel_command("info", "workspace").strip())
+    return Path(run_bazel_command_output("info", "workspace").strip())
+
+
+def configure_logging(*, verbose: bool) -> None:
+    lvl = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(level=lvl, format="%(asctime)s [%(levelname)s] %(message)s")
+
+
+def check_dependencies() -> bool:
+    if not shutil.which("bazel"):
+        logging.warning("Bazel is required! Please install Bazel first.")
+        return False
+    return True
+
+
+def setup_vscode_directory(vscode_dir: Path) -> None:
+    if not vscode_dir.exists():
+        logging.debug("Creating .vscode directory in the workspace root.")
+        vscode_dir.mkdir(parents=True)
+
+
+def generate_executable_labels(args: argparse.Namespace) -> set[str]:
+    if args.generate_launch_json or args.generate_build_targets:
+        return find_executable_labels(args.bazel_pattern, args.force)
+    return set()
+
+
+def handle_tasks_json_generation(args: argparse.Namespace, executable_labels: set[str], vscode_dir: Path) -> None:
+    if args.generate_build_targets:
+        if update_tasks_json(executable_labels, vscode_dir / "tasks.json", args.additional_debug_arg, force=args.force):
+            logging.info(
+                "Build targets generated in `tasks.json`. Consider using Task: Run Build Task from the Command Palette."
+            )
+        else:
+            logging.error("No executable targets found, no `tasks.json` generated.")
+
+
+def handle_launch_json_generation(
+    args: argparse.Namespace, executable_labels: set[str], vscode_dir: Path, recommended_actions: list[tuple[str, ...]]
+) -> None:
+    if args.generate_launch_json:
+        success = update_launch_json(
+            executable_labels,
+            vscode_dir / "launch.json",
+            args.force,
+            are_build_targets_generated=args.generate_build_targets,
+        )
+        if success:
+            logging.info("You can now run the debug target(s) in VS Code.")
+            if not args.generate_build_targets:
+                recommended_actions.append(("bazel", "build", *args.additional_debug_arg, *args.bazel_pattern))
+        else:
+            logging.error("No executable targets found, no `launch.json` generated.")
+
+
+def handle_compile_commands_generation(
+    args: argparse.Namespace, vscode_dir: Path, recommended_actions: list[tuple[str, ...]]
+) -> None:
+    if args.generate_compile_commands:
+        success = update_cc_build_file(
+            args.bazel_pattern, args.additional_compile_commands_arg, vscode_dir / "BUILD.bazel", args.force
+        )
+        if success:
+            logging.info("Run the following commands in case you need to refresh the `compile_commands.json` file.")
+            recommended_actions.extend(
+                [
+                    ("bazel", "build", *args.additional_compile_commands_arg, *args.bazel_pattern),
+                    ("bazel", "run", "//.vscode:refresh_compile_commands"),
+                ]
+            )
+
+
+def execute_recommended_actions(args: argparse.Namespace, recommended_actions: list[tuple[str, ...]]) -> None:
+    if recommended_actions:
+        if args.build:
+            for action in recommended_actions:
+                # action format is ("bazel", "command", "arg1", "arg2", ...)
+                run_bazel_command(*action[1:], verbose=args.verbose)
+        else:
+            # If not building immediately, provide suggestions to the user
+            suggested_cmds = "\n".join(" ".join(cmd) for cmd in recommended_actions)
+            logging.info("Remember to re-build the target(s) with:\n\n%s", suggested_cmds)
 
 
 def main() -> int:
     args = parse_arguments()
-    lvl = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(level=lvl, format="%(asctime)s [%(levelname)s] %(message)s")
+    configure_logging(verbose=args.verbose)
 
-    if not shutil.which("bazel"):
-        logging.warning("Bazel is required! Please install Bazel first.")
+    if not check_dependencies():
         return 1
 
     vscode_dir = get_workspace_root() / ".vscode"
+    setup_vscode_directory(vscode_dir)
 
-    recommended_actions = []
+    executable_labels = generate_executable_labels(args)
 
-    if args.generate_launch_json:
-        if update_launch_json(args.bazel_pattern, vscode_dir / "launch.json", args.force):
-            logging.info("You can now run the debug target(s) in VS Code.")
-            recommended_actions.append(("bazel", "build", *args.additional_debug_arg, *args.bazel_pattern))
-        else:
-            logging.error("No executable targets were found, no `launch.json` file was generated.")
+    recommended_actions: list[tuple[str, ...]] = []
+    handle_tasks_json_generation(args, executable_labels, vscode_dir)
+    handle_launch_json_generation(args, executable_labels, vscode_dir, recommended_actions)
+    handle_compile_commands_generation(args, vscode_dir, recommended_actions)
 
-    if args.generate_compile_commands and update_cc_build_file(
-        args.bazel_pattern, args.additional_compile_commands_arg, vscode_dir / "BUILD.bazel", args.force
-    ):
-        logging.info("You can now generate the `compile_commands.json` file.")
-        recommended_actions.append(("bazel", "build", *args.additional_compile_commands_arg, *args.bazel_pattern))
-        recommended_actions.append(("bazel", "run", "//.vscode:refresh_compile_commands"))
-
-    if args.build:
-        for _bazel, *command in recommended_actions:
-            run_bazel_command(*command)
-
-    logging.info("Remember to re-build the target(s) with:\n\n%s", "\n".join(" ".join(c) for c in recommended_actions))
+    execute_recommended_actions(args, recommended_actions)
 
     return 0
 
