@@ -21,7 +21,7 @@ from typing import Any, Sequence
 MAX_TARGETS_WITHOUT_CONFIRMATION = 20
 
 
-def add_run_and_debug_arguments(parser: argparse.ArgumentParser) -> None:
+def add_run_and_debug_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument(
         "--generate-launch-json",
         action="store_true",
@@ -63,6 +63,7 @@ def add_run_and_debug_arguments(parser: argparse.ArgumentParser) -> None:
     )
     # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
     parser.set_defaults(generate_compile_commands=True)
+    return parser
 
 
 def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
@@ -109,7 +110,7 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="Additional arguments to pass to the `compile_commands.json` refresh template.",
     )
 
-    add_run_and_debug_arguments(parser)
+    parser = add_run_and_debug_arguments(parser)
 
     return parser.parse_args(argv)
 
@@ -211,9 +212,7 @@ def get_build_task_label(bazel_label: str) -> str:
 def try_get_task_dependency(label: str, *, task_exists: bool = False) -> dict[str, Any]:
     """Convert a Bazel label to a VSCode pre-requisite task reference, as required by
     launch.json configuration."""
-    if not task_exists:
-        return {}
-    return {"preLaunchTask": get_build_task_label(label)}
+    return {"preLaunchTask": get_build_task_label(label)} if task_exists else {}
 
 
 def get_new_launch_config(executable_labels: set[str], *, build_tasks_exist: bool = False) -> dict[str, Any]:
@@ -251,8 +250,7 @@ def get_new_launch_config(executable_labels: set[str], *, build_tasks_exist: boo
 
 
 def get_new_tasks_config(executable_labels: set[str], additional_debug_args: list[str] | None = None) -> dict[str, Any]:
-    if additional_debug_args is None:
-        additional_debug_args = []
+    args = [build, *(additional_debug_args or []), label]
     return {
         "version": "2.0.0",
         "tasks": [
@@ -263,15 +261,11 @@ def get_new_tasks_config(executable_labels: set[str], additional_debug_args: lis
                 "group": {
                     "kind": "build",
                 },
-                "args": [
-                    "build",
-                    *additional_debug_args,
-                    label,
-                ],
+                "args": args,
                 "presentation": {
                     "clear": True,
                 },
-                "detail": f"bazel build {' '.join(additional_debug_args)} {label}",
+                "detail": f"bazel {' '.join(args)}",
             }
             for label in executable_labels
         ],
@@ -351,7 +345,7 @@ def check_dependencies() -> bool:
 
 def setup_vscode_directory(vscode_dir: Path) -> None:
     if not vscode_dir.exists():
-        logging.info("Creating .vscode directory in the workspace root.")
+        logging.debug("Creating .vscode directory in the workspace root.")
         vscode_dir.mkdir(parents=True)
 
 
@@ -397,7 +391,7 @@ def handle_compile_commands_generation(
             args.bazel_pattern, args.additional_compile_commands_arg, vscode_dir / "BUILD.bazel", args.force
         )
         if success:
-            logging.info("You can now generate the `compile_commands.json` file.")
+            logging.info("Run the following commands in case you need to refresh the `compile_commands.json` file.")
             recommended_actions.extend(
                 [
                     ("bazel", "build", *args.additional_compile_commands_arg, *args.bazel_pattern),
