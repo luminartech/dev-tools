@@ -260,11 +260,12 @@ def save_new_json_config(new_config: dict[str, Any], config_location: Path, forc
 
     If the file already exists, asks for confirmation, unless force is set.
     """
-    if confirm_config_overwrite(config_location, force):
-        config_location.write_text(json.dumps(new_config, indent=4))
-        logging.info("Saved new configuration to %s", config_location)
-        return True
-    return False
+    if not confirm_config_overwrite(config_location, force):
+        return False
+
+    config_location.write_text(json.dumps(new_config, indent=4))
+    logging.info("Saved new configuration to %s", config_location)
+    return True
 
 
 def update_launch_json(executable_labels: set[str], config_location: Path, *, force: bool = False) -> bool:
@@ -284,24 +285,25 @@ def update_tasks_json(
 
 
 def update_cc_build_file(bazel_patterns: list[str], bazel_args: list[str], config_location: Path, force: bool) -> bool:  # noqa: FBT001
-    if confirm_config_overwrite(config_location, force):
-        args = " ".join(bazel_args)
-        targets = dict.fromkeys(bazel_patterns, args)
-        config_location.write_text(
-            textwrap.dedent(
-                f"""
-                load("@hedron_compile_commands//:refresh_compile_commands.bzl", "refresh_compile_commands")
+    if not confirm_config_overwrite(config_location, force):
+        return False
 
-                refresh_compile_commands(
-                    name = "refresh_compile_commands",
-                    targets = {targets},
-                )
-                """
-            ).strip()
-        )
-        logging.info("Saved new BUILD.bazel to %s", config_location)
-        return True
-    return False
+    args = " ".join(bazel_args)
+    targets = dict.fromkeys(bazel_patterns, args)
+    config_location.write_text(
+        textwrap.dedent(
+            f"""
+            load("@hedron_compile_commands//:refresh_compile_commands.bzl", "refresh_compile_commands")
+
+            refresh_compile_commands(
+                name = "refresh_compile_commands",
+                targets = {targets},
+            )
+            """
+        ).strip()
+    )
+    logging.info("Saved new BUILD.bazel to %s", config_location)
+    return True
 
 
 def get_workspace_root() -> Path:
@@ -327,61 +329,69 @@ def setup_vscode_directory(vscode_dir: Path) -> None:
 
 
 def generate_executable_labels(args: argparse.Namespace) -> set[str]:
-    if args.generate_build_targets:
-        return find_executable_labels(args.bazel_pattern, args.force)
-    return set()
+    return find_executable_labels(args.bazel_pattern, args.force) if args.generate_build_targets else set()
 
 
-def handle_tasks_json_generation(args: argparse.Namespace, executable_labels: set[str], vscode_dir: Path) -> None:
-    if args.generate_build_targets:
-        if update_tasks_json(executable_labels, vscode_dir / "tasks.json", args.additional_debug_arg, force=args.force):
-            logging.info(
-                "Build targets generated in `tasks.json`. Consider using Task: Run Build Task from the Command Palette."
-            )
-        else:
-            logging.error("No executable targets found, no `tasks.json` generated.")
+def handle_tasks_json_generation(args: argparse.Namespace, executable_labels: set[str], vscode_dir: Path) -> bool:
+    if not args.generate_build_targets:
+        return True
+
+    if update_tasks_json(executable_labels, vscode_dir / "tasks.json", args.additional_debug_arg, force=args.force):
+        logging.info(
+            "Build targets generated in `tasks.json`. Bonus: you can use Run Build Task from the Command Palette."
+        )
+        return True
+
+    logging.error("No executable targets found, no `tasks.json` generated.")
+    return False
 
 
 def handle_launch_json_generation(args: argparse.Namespace, executable_labels: set[str], vscode_dir: Path) -> None:
-    if args.generate_build_targets:
-        success = update_launch_json(
-            executable_labels,
-            vscode_dir / "launch.json",
-            force=args.force,
-        )
-        if success:
-            logging.info("You can now run the debug target(s) in VS Code.")
-        else:
-            logging.error("No executable targets found, no `launch.json` generated.")
+    if not args.generate_build_targets:
+        return
+
+    success = update_launch_json(
+        executable_labels,
+        vscode_dir / "launch.json",
+        force=args.force,
+    )
+    if success:
+        logging.info("You can now run the debug target(s) in VS Code.")
+    else:
+        logging.error("No executable targets found, no `launch.json` generated.")
 
 
 def handle_compile_commands_generation(
     args: argparse.Namespace, vscode_dir: Path, recommended_actions: list[tuple[str, ...]]
 ) -> None:
-    if args.generate_compile_commands:
-        success = update_cc_build_file(
-            args.bazel_pattern, args.additional_compile_commands_arg, vscode_dir / "BUILD.bazel", args.force
+    if not args.generate_compile_commands:
+        return
+
+    success = update_cc_build_file(
+        args.bazel_pattern, args.additional_compile_commands_arg, vscode_dir / "BUILD.bazel", args.force
+    )
+    if success:
+        logging.info("Run the suggested commands in case you need to refresh the `compile_commands.json` file.")
+        recommended_actions.extend(
+            [
+                ("bazel", "build", *args.additional_compile_commands_arg, *args.bazel_pattern),
+                ("bazel", "run", "//.vscode:refresh_compile_commands"),
+            ]
         )
-        if success:
-            logging.info("Run the following commands in case you need to refresh the `compile_commands.json` file.")
-            recommended_actions.extend(
-                [
-                    ("bazel", "build", *args.additional_compile_commands_arg, *args.bazel_pattern),
-                    ("bazel", "run", "//.vscode:refresh_compile_commands"),
-                ]
-            )
 
 
 def execute_recommended_actions(args: argparse.Namespace, recommended_actions: list[tuple[str, ...]]) -> None:
-    if recommended_actions:
-        if args.build:
-            for action in recommended_actions:
-                # action format is ("bazel", "command", "arg1", "arg2", ...)
-                run_bazel_command(*action[1:], verbose=args.verbose)
-        else:
-            # If not building immediately, provide suggestions to the user
-            suggested_cmds = "\n".join(" ".join(cmd) for cmd in recommended_actions)
-            logging.info("Remember to re-build the target(s) with:\n\n%s", suggested_cmds)
+    if not recommended_actions:
+        return
+
+    if args.build:
+        for action in recommended_actions:
+            # action format is ("bazel", "command", "arg1", "arg2", ...)
+            run_bazel_command(*action[1:], verbose=args.verbose)
+    else:
+        # If not building immediately, provide suggestions to the user
+        suggested_cmds = "\n".join(" ".join(cmd) for cmd in recommended_actions)
+        logging.info("Remember to re-build the target(s) with:\n\n%s", suggested_cmds)
 
 
 def main() -> int:
@@ -397,8 +407,9 @@ def main() -> int:
     executable_labels = generate_executable_labels(args)
 
     recommended_actions: list[tuple[str, ...]] = []
-    handle_tasks_json_generation(args, executable_labels, vscode_dir)
-    handle_launch_json_generation(args, executable_labels, vscode_dir)
+    tasks_generated = handle_tasks_json_generation(args, executable_labels, vscode_dir)
+    if tasks_generated:
+        handle_launch_json_generation(args, executable_labels, vscode_dir)
     handle_compile_commands_generation(args, vscode_dir, recommended_actions)
 
     execute_recommended_actions(args, recommended_actions)
