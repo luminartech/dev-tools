@@ -342,9 +342,7 @@ def handle_tasks_json_generation(args: argparse.Namespace, executable_labels: se
             logging.error("No executable targets found, no `tasks.json` generated.")
 
 
-def handle_launch_json_generation(
-    args: argparse.Namespace, executable_labels: set[str], vscode_dir: Path, recommended_actions: list[tuple[str, ...]]
-) -> None:
+def handle_launch_json_generation(args: argparse.Namespace, executable_labels: set[str], vscode_dir: Path) -> None:
     if args.generate_build_targets:
         success = update_launch_json(
             executable_labels,
@@ -353,8 +351,6 @@ def handle_launch_json_generation(
         )
         if success:
             logging.info("You can now run the debug target(s) in VS Code.")
-            if not args.generate_build_targets:
-                recommended_actions.append(("bazel", "build", *args.additional_debug_arg, *args.bazel_pattern))
         else:
             logging.error("No executable targets found, no `launch.json` generated.")
 
@@ -402,7 +398,7 @@ def main() -> int:
 
     recommended_actions: list[tuple[str, ...]] = []
     handle_tasks_json_generation(args, executable_labels, vscode_dir)
-    handle_launch_json_generation(args, executable_labels, vscode_dir, recommended_actions)
+    handle_launch_json_generation(args, executable_labels, vscode_dir)
     handle_compile_commands_generation(args, vscode_dir, recommended_actions)
 
     execute_recommended_actions(args, recommended_actions)
