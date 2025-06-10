@@ -23,18 +23,18 @@ MAX_TARGETS_WITHOUT_CONFIRMATION = 20
 
 def add_run_and_debug_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument(
-        "--generate-build-targets",
+        "--generate-debug-config",
         action="store_true",
         help="Generate the `launch.json` and `tasks.json` files containing debug and build targets. This is the default.",
     )
     parser.add_argument(
-        "--no-generate-build-targets",
-        dest="generate_build_targets",
+        "--no-generate-debug-config",
+        dest="generate_debug_config",
         action="store_false",
         help="Do not generate the debug and build targets.",
     )
     # TODO(#80): use https://docs.python.org/3/library/argparse.html#argparse.BooleanOptionalAction with Python >= 3.9 # noqa: FIX002
-    parser.set_defaults(generate_build_targets=True)
+    parser.set_defaults(generate_debug_config=True)
 
     parser.add_argument(
         "--generate-compile-commands",
@@ -329,11 +329,11 @@ def setup_vscode_directory(vscode_dir: Path) -> None:
 
 
 def generate_executable_labels(args: argparse.Namespace) -> set[str]:
-    return find_executable_labels(args.bazel_pattern, args.force) if args.generate_build_targets else set()
+    return find_executable_labels(args.bazel_pattern, args.force) if args.generate_debug_config else set()
 
 
 def handle_tasks_json_generation(args: argparse.Namespace, executable_labels: set[str], vscode_dir: Path) -> bool:
-    if not args.generate_build_targets:
+    if not args.generate_debug_config:
         return True
 
     if update_tasks_json(executable_labels, vscode_dir / "tasks.json", args.additional_debug_arg, force=args.force):
@@ -347,10 +347,10 @@ def handle_tasks_json_generation(args: argparse.Namespace, executable_labels: se
 
 
 def handle_launch_json_generation(args: argparse.Namespace, executable_labels: set[str], vscode_dir: Path) -> None:
-    if not args.generate_build_targets:
+    if not args.generate_debug_config:
         return
 
-   if update_launch_json(
+    if update_launch_json(
         executable_labels,
         vscode_dir / "launch.json",
         force=args.force,
