@@ -350,15 +350,14 @@ def handle_launch_json_generation(args: argparse.Namespace, executable_labels: s
     if not args.generate_build_targets:
         return
 
-    success = update_launch_json(
+   if update_launch_json(
         executable_labels,
         vscode_dir / "launch.json",
         force=args.force,
-    )
-    if success:
+    ):
         logging.info("You can now run the debug target(s) in VS Code.")
-    else:
-        logging.error("No executable targets found, no `launch.json` generated.")
+        return
+    logging.error("No executable targets found, no `launch.json` generated.")
 
 
 def handle_compile_commands_generation(
