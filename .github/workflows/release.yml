@@ -17,8 +17,7 @@ jobs:
         run: |
           export VERSION=${{ github.ref_name }}
           echo "Using version: $VERSION"
-          sed -i "s/version = \"0.0.0\" # Will be set by the release pipeline/version = \"$VERSION\"/" pyproject.toml
-          grep version pyproject.toml
+          grep "version = \"$VERSION\"" pyproject.toml || (echo "Version mismatch in pyproject.toml vs the tag name" && exit 1)
       - uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2.2
         with:
           draft: false
