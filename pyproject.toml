@@ -41,7 +41,7 @@ pyjson5 = ">=1.6.8"
 [tool.poetry.group.dev.dependencies]
 pytest = "==8.3.5"
 pytest-cov = "==5.0.0"
-pyfakefs = "==5.8.0"
+pyfakefs = "==5.9.1"
 ruamel-yaml = "==0.18.10"
 
 [tool.poetry.scripts]
