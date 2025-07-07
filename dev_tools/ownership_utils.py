@@ -96,7 +96,7 @@ def parse_ownership(codeowners_file: Path) -> tuple[OwnerShipEntry, ...]:
     return tuple(reversed(tuple(get_ownership_entries(codeowners_file))))
 
 
-def get_ownership_entries(codeowners_file: Path) -> Generator[OwnerShipEntry, None, None]:
+def get_ownership_entries(codeowners_file: Path) -> Generator[OwnerShipEntry]:
     with codeowners_file.open() as file:
         for line_number, line in enumerate(file.readlines(), start=1):
             current_line = line.strip()
