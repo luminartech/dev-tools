@@ -119,7 +119,7 @@ def print_excluded_files_count(hooks_list: list[Any]) -> None:
     for hook in hooks_list:
         excluded_count = hook.count_excluded_files()
         if excluded_count > 0:
-            print(f"{excluded_count}\tfiles excluded from hook {hook.id}")
+            print(f"{excluded_count} files excluded from hook {hook.id}")
 
 
 def main() -> int:
