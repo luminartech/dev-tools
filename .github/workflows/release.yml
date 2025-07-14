@@ -18,7 +18,7 @@ jobs:
           export VERSION=${{ github.ref_name }}
           echo "Using version: $VERSION"
           grep "version = \"$VERSION\"" pyproject.toml || (echo "Version mismatch in pyproject.toml vs the tag name" && exit 1)
-      - uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2.2
+      - uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
         with:
           draft: false
           prerelease: false
