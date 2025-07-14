@@ -114,13 +114,14 @@ def have_non_existent_paths_or_duplicates(hooks_list: list[Any]) -> bool:
 
 
 def print_excluded_files_count(hooks_list: list[Any]) -> None:
-    hooks_with_excluded_files = [hook for hook in hooks_list if hook.count_excluded_files() > 0]
+    hooks_with_excluded_files = [
+        {"hook_id": hook.id, "excluded_files_count": hook.count_excluded_files()}
+        for hook in hooks_list
+        if hook.count_excluded_files() > 0
+    ]
     output_data = {
-        "total_excluded_files": sum(hook.count_excluded_files() for hook in hooks_list),
-        "hooks": [
-            {"hook_id": hook.id, "excluded_files_count": hook.count_excluded_files()}
-            for hook in hooks_with_excluded_files
-        ],
+        "total_excluded_files": sum(hook["excluded_files_count"] for hook in hooks_with_excluded_files),
+        "hooks": hooks_with_excluded_files,
     }
     print(json.dumps(output_data, indent=2))
 
