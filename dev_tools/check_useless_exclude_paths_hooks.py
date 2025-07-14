@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import itertools
+import json
 import sys
 from collections import Counter
 from pathlib import Path
@@ -113,13 +114,15 @@ def have_non_existent_paths_or_duplicates(hooks_list: list[Any]) -> bool:
 
 
 def print_excluded_files_count(hooks_list: list[Any]) -> None:
-    total_excluded = sum(hook.count_excluded_files() for hook in hooks_list)
-    print(f"Total number of excluded files: {total_excluded}")
-
-    for hook in hooks_list:
-        excluded_count = hook.count_excluded_files()
-        if excluded_count > 0:
-            print(f"{excluded_count} files excluded from hook {hook.id}")
+    hooks_with_excluded_files = [hook for hook in hooks_list if hook.count_excluded_files() > 0]
+    output_data = {
+        "total_excluded_files": sum(hook.count_excluded_files() for hook in hooks_list),
+        "hooks": [
+            {"hook_id": hook.id, "excluded_files_count": hook.count_excluded_files()}
+            for hook in hooks_with_excluded_files
+        ],
+    }
+    print(json.dumps(output_data, indent=2))
 
 
 def main() -> int:
