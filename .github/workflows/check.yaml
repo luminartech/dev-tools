@@ -43,4 +43,4 @@ jobs:
       - name: Install pre-commit
         run: python -m pip install pre-commit
       - name: Run pre-commit
-        run: pre-commit run check-useless-exclude-paths-hooks --verbose
+        run: pre-commit run check-non-existing-and-duplicate-excludes --verbose
