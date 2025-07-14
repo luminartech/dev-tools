@@ -113,7 +113,7 @@ def have_non_existent_paths_or_duplicates(hooks_list: list[Any]) -> bool:
     return bool(non_existing_paths or duplicates)
 
 
-def print_excluded_files_count(hooks_list: list[Any]) -> None:
+def print_excluded_files_report(hooks_list: list[Any]) -> None:
     hooks_with_excluded_files = [
         {"hook_id": hook.id, "excluded_files_count": hook.count_excluded_files()}
         for hook in hooks_list
@@ -130,7 +130,7 @@ def main() -> int:
     repo_root = Path.cwd()
     pre_commit_config = repo_root / CONFIG_FILE
     hooks_list = load_hooks(repo_root, pre_commit_config)
-    print_excluded_files_count(hooks_list)
+    print_excluded_files_report(hooks_list)
     return 1 if have_non_existent_paths_or_duplicates(hooks_list) else 0
 
 
