@@ -58,6 +58,15 @@ class Hook:
     def has_non_existing_paths(self) -> bool:
         return bool(self.find_non_existing_paths())
 
+    def count_excluded_files(self) -> int:
+        existing_paths = [path for path in self.exclude_paths if path.exists()]
+        total_file_count = sum(1 for path in existing_paths if path.is_file())
+        excluded_dirs = [path for path in existing_paths if path.is_dir()]
+        total_dir_count = sum(
+            sum(1 for file in excluded_dir.rglob("*") if file.is_file()) for excluded_dir in excluded_dirs
+        )
+        return total_file_count + total_dir_count
+
 
 def is_regex_pattern(exclude: str) -> bool:
     return any(regex_key in exclude for regex_key in ["*", "$", "^"])
@@ -101,10 +110,22 @@ def have_non_existent_paths_or_duplicates(hooks_list: list[Any]) -> bool:
     return bool(non_existing_paths or duplicates)
 
 
+def print_excluded_files_count(hooks_list: list[Any]) -> None:
+    total_excluded = sum(hook.count_excluded_files() for hook in hooks_list)
+    print(f"Total number of excluded files: {total_excluded}")
+
+    for hook in hooks_list:
+        excluded_count = hook.count_excluded_files()
+        if excluded_count > 0:
+            print(f"Hook {hook.id}: Files excluded: {excluded_count}")
+
+
 def main() -> int:
     repo_root = Path.cwd()
     pre_commit_config = repo_root / CONFIG_FILE
-    return 1 if have_non_existent_paths_or_duplicates(load_hooks(repo_root, pre_commit_config)) else 0
+    hooks_list = load_hooks(repo_root, pre_commit_config)
+    print_excluded_files_count(hooks_list)
+    return 1 if have_non_existent_paths_or_duplicates(hooks_list) else 0
 
 
 if __name__ == "__main__":
