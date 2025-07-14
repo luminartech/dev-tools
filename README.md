@@ -128,7 +128,7 @@ Check that all TODO comments follow the same pattern and link a Jira ticket: `TO
 
 ### `check-non-existing-and-duplicate-excludes`
 
-Check for non existing and duplicate paths in `.pre-commit-config.yaml`. Background: In a big codebase, the exclude lists can be quite long and it's easy to make a typo or forget to remove an entry when it's no longer needed.
+Check for non existing and duplicate paths in `.pre-commit-config.yaml`. Background: In a big codebase, the exclude lists can be quite long and it's easy to make a typo or forget to remove an entry when it's no longer needed. If you run this hook with `--verbose` it will also print the number of excluded files for each hook.
 
 ### `sync-vscode-config`
 

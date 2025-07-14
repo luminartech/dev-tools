@@ -103,7 +103,7 @@
     - svg
 - id: check-non-existing-and-duplicate-excludes
   name: Check non-existing and duplicate excludes in pre-commit-config
-  description: "Check for non existing and duplicate paths in `.pre-commit-config.yaml`. Background: In a big codebase, the exclude lists can be quite long and it's easy to make a typo or forget to remove an entry when it's no longer needed."
+  description: "Check for non existing and duplicate paths in `.pre-commit-config.yaml`. Background: In a big codebase, the exclude lists can be quite long and it's easy to make a typo or forget to remove an entry when it's no longer needed. If you run this hook with `--verbose` it will also print the number of excluded files for each hook."
   entry: check-useless-exclude-paths-hooks
   pass_filenames: false
   always_run: true

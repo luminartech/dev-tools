@@ -202,3 +202,63 @@ def test_have_non_existent_paths_or_duplicates_for_duplicate_paths(
     assert "duplicates" in output
     assert "existing_path1" in output
     assert "existing_path2" in output
+
+
+def test_count_excluded_files_for_single_file(fs: FakeFilesystem) -> None:
+    fs.create_file(Path("Repo/test_file.txt"))
+    hook_instance = Hook("test_id", [Path("Repo/test_file.txt")])
+
+    assert hook_instance.count_excluded_files() == 1
+
+
+def test_count_excluded_files_for_multiple_files(fs: FakeFilesystem) -> None:
+    fs.create_file(Path("Repo/file1.txt"))
+    fs.create_file(Path("Repo/file2.txt"))
+    fs.create_file(Path("Repo/file3.txt"))
+    hook_instance = Hook("test_id", [Path("Repo/file1.txt"), Path("Repo/file2.txt"), Path("Repo/file3.txt")])
+
+    assert hook_instance.count_excluded_files() == 3
+
+
+def test_count_excluded_files_for_directory(fs: FakeFilesystem) -> None:
+    fs.create_dir(Path("Repo/test_dir"))
+    fs.create_file(Path("Repo/test_dir/file1.txt"))
+    fs.create_file(Path("Repo/test_dir/file2.txt"))
+    fs.create_file(Path("Repo/test_dir/subdir/file3.txt"))
+    hook_instance = Hook("test_id", [Path("Repo/test_dir")])
+
+    assert hook_instance.count_excluded_files() == 3
+
+
+def test_count_excluded_files_for_mixed_paths(fs: FakeFilesystem) -> None:
+    fs.create_file(Path("Repo/single_file.txt"))
+    fs.create_dir(Path("Repo/test_dir"))
+    fs.create_file(Path("Repo/test_dir/file1.txt"))
+    fs.create_file(Path("Repo/test_dir/file2.txt"))
+    hook_instance = Hook("test_id", [Path("Repo/single_file.txt"), Path("Repo/test_dir")])
+
+    assert hook_instance.count_excluded_files() == 3
+
+
+def test_count_excluded_files_for_non_existing_paths() -> None:
+    hook_instance = Hook("test_id", [Path("Repo/non_existing_file.txt"), Path("Repo/non_existing_dir")])
+
+    assert hook_instance.count_excluded_files() == 0
+
+
+def test_count_excluded_files_for_mixed_existing_and_non_existing_paths(fs: FakeFilesystem) -> None:
+    fs.create_file(Path("Repo/existing_file.txt"))
+    fs.create_dir(Path("Repo/existing_dir"))
+    fs.create_file(Path("Repo/existing_dir/file.txt"))
+    hook_instance = Hook(
+        "test_id",
+        [Path("Repo/existing_file.txt"), Path("Repo/existing_dir"), Path("Repo/non_existing_file.txt")],
+    )
+
+    assert hook_instance.count_excluded_files() == 2
+
+
+def test_count_excluded_files_for_empty_exclude_paths() -> None:
+    hook_instance = Hook("test_id", [])
+
+    assert hook_instance.count_excluded_files() == 0
