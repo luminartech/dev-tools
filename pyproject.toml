@@ -28,7 +28,7 @@ warn_unused_ignores = true
 
 [tool.poetry]
 name = "dev-tools"
-version = "0.13.2" # Will be read by the release pipeline
+version = "0.13.3" # Will be read by the release pipeline
 description = ""
 authors = ["BRE <bre@luminartech.com>"]
 readme = "README.md"
