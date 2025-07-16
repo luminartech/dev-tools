@@ -43,4 +43,4 @@ jobs:
       - name: Install pre-commit
         run: python -m pip install pre-commit
       - name: Run pre-commit to show excluded files
-        run: pre-commit try-repo . print-pre-commit-metrics --all-files --verbose
+        run: SKIP=check-jira-reference-in-todo,check-ownership,go-revive,go-fmt,go-imports pre-commit try-repo . --all-files --verbose
