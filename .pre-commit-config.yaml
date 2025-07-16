@@ -14,13 +14,6 @@ repos:
       - id: check-useless-excludes
   - repo: local
     hooks:
-      - id: check-non-existing-and-duplicate-excludes
-        name: Check non-existing and duplicate excludes in pre-commit-config
-        entry: dev_tools/check_useless_exclude_paths_hooks.py
-        pass_filenames: false
-        always_run: true
-        language: python
-        additional_dependencies: ["pre-commit >= 3.5.0"]
       - id: generate-hook-docs
         name: generate hook docs
         description: Generate markdown documentation for pre-commit hooks in README.md

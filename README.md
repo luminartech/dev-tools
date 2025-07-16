@@ -25,6 +25,7 @@ These tools are used to help developers in their day-to-day tasks.
   - [`check-shellscript-set-options`](#check-shellscript-set-options)
   - [`check-jira-reference-in-todo`](#check-jira-reference-in-todo)
   - [`check-non-existing-and-duplicate-excludes`](#check-non-existing-and-duplicate-excludes)
+  - [`print-pre-commit-metrics`](#print-pre-commit-metrics)
   - [`sync-vscode-config`](#sync-vscode-config)
   - [`check-ownership`](#check-ownership)
 - [Contributing](#contributing)
@@ -128,7 +129,16 @@ Check that all TODO comments follow the same pattern and link a Jira ticket: `TO
 
 ### `check-non-existing-and-duplicate-excludes`
 
-Check for non existing and duplicate paths in `.pre-commit-config.yaml`. Background: In a big codebase, the exclude lists can be quite long and it's easy to make a typo or forget to remove an entry when it's no longer needed. If you run this hook with `--verbose` it will also print the number of excluded files for each hook.
+Check for non existing and duplicate paths in `.pre-commit-config.yaml`.
+
+Background: In a big codebase, the exclude lists can be quite long and it's easy to make a typo or forget to remove an entry when it's no longer needed.
+This hook helps you to maintain a clean and up to date exclude list.
+
+### `print-pre-commit-metrics`
+
+Count the number of excludes in `.pre-commit-config.yaml` and print them in json format.
+
+On large projects this can help to collect metrics over time for how many files are excluded from pre-commit.
 
 ### `sync-vscode-config`
 
