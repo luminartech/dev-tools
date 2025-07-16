@@ -1,12 +1,9 @@
-#!/usr/bin/env python
-
 # Copyright (c) Luminar Technologies, Inc. All rights reserved.
 # Licensed under the MIT License.
 
 from __future__ import annotations
 
 import itertools
-import json
 import sys
 from collections import Counter
 from pathlib import Path
@@ -113,24 +110,10 @@ def have_non_existent_paths_or_duplicates(hooks_list: list[Any]) -> bool:
     return bool(non_existing_paths or duplicates)
 
 
-def print_excluded_files_report(hooks_list: list[Any]) -> None:
-    hooks_with_excluded_files = [
-        {"hook_id": hook.id, "excluded_files_count": hook.count_excluded_files()}
-        for hook in hooks_list
-        if hook.count_excluded_files() > 0
-    ]
-    output_data = {
-        "total_excluded_files": sum(hook["excluded_files_count"] for hook in hooks_with_excluded_files),
-        "hooks": hooks_with_excluded_files,
-    }
-    print(json.dumps(output_data, indent=2))
-
-
 def main() -> int:
     repo_root = Path.cwd()
     pre_commit_config = repo_root / CONFIG_FILE
     hooks_list = load_hooks(repo_root, pre_commit_config)
-    print_excluded_files_report(hooks_list)
     return 1 if have_non_existent_paths_or_duplicates(hooks_list) else 0
 
 
