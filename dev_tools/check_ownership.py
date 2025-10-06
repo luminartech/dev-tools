@@ -149,7 +149,7 @@ def perform_all_codeowners_checks(repo_dir: Path) -> ReturnCode:
     return return_code
 
 
-def is_empty(iterable: Generator[Path, None, None]) -> bool:
+def is_empty(iterable: Generator[Path]) -> bool:
     return next(iterable, None) is None
 
 
