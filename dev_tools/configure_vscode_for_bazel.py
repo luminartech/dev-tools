@@ -76,7 +76,8 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
     build_actions.add_argument(
         "--build-only-commands",
         action="store_true",
-        help="Run recommended bazel run action. Compared to --build, this works when the codebase doesn't compile yet, but might fail to recognize eg. generated source files.",
+        help="Run recommended bazel run action. "
+        "Compared to --build, this works when the codebase doesn't compile yet, but might fail to recognize eg. generated source files.",
     )
 
     parser.add_argument(
