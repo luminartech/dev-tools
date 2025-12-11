@@ -24,7 +24,7 @@ def _sets_options_or_is_nolint(line: str, expected_options: str) -> bool:
 
 
 def _is_valid_shell_file(filename: Path, expected_options: str) -> bool:
-    lines = filename.read_text(encoding='utf-8').splitlines()
+    lines = filename.read_text(encoding="utf-8").splitlines()
     return any(_sets_options_or_is_nolint(line, expected_options) for line in lines)
 
 
@@ -39,7 +39,7 @@ def _separate_bash_from_sh_files(filenames: Sequence[Path]) -> tuple[bool, list[
     sh_files = []
     all_valid = True
     for filename in filenames:
-        first_line = filename.open(encoding='utf-8').readline()
+        first_line = filename.open(encoding="utf-8").readline()
         if _does_shebang_match("bash", first_line) or filename.suffix == ".bash":
             bash_files.append(filename)
         elif _does_shebang_match("sh", first_line):
