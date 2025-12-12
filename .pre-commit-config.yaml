@@ -85,11 +85,6 @@ repos:
             .vscode/
           )
       - id: trailing-whitespace
-  - repo: https://github.com/mattlqx/pre-commit-search-and-replace
-    rev: v1.1.8
-    hooks:
-      - id: search-and-replace
-        language_version: default # https://github.com/mattlqx/pre-commit-search-and-replace/issues/28
   - repo: https://github.com/pre-commit/sync-pre-commit-deps
     rev: v0.0.1 # Last version to support Python 3.8
     hooks:
