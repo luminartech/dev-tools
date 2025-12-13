@@ -66,10 +66,18 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Show verbose output.",
     )
-    parser.add_argument(
+
+    build_actions = parser.add_mutually_exclusive_group()
+    build_actions.add_argument(
         "--build",
         action="store_true",
         help="Run recommended bazel build/run actions.",
+    )
+    build_actions.add_argument(
+        "--build-only-commands",
+        action="store_true",
+        help="Run recommended bazel run action. "
+        "Compared to --build, this works when the codebase doesn't compile yet, but might fail to recognize eg. generated source files.",
     )
 
     parser.add_argument(
@@ -371,19 +379,22 @@ def handle_compile_commands_generation(
     )
     if success:
         logging.info("Run the suggested commands in case you need to refresh the `compile_commands.json` file.")
-        recommended_actions.extend(
-            [
-                ("bazel", "build", *args.additional_compile_commands_arg, *args.bazel_pattern),
-                ("bazel", "run", "//.vscode:refresh_compile_commands"),
-            ]
-        )
+        if args.build_only_commands:
+            recommended_actions.append(("bazel", "run", "--keep_going", "//.vscode:refresh_compile_commands"))
+        else:
+            recommended_actions.extend(
+                [
+                    ("bazel", "build", *args.additional_compile_commands_arg, *args.bazel_pattern),
+                    ("bazel", "run", "//.vscode:refresh_compile_commands"),
+                ]
+            )
 
 
 def execute_recommended_actions(args: argparse.Namespace, recommended_actions: list[tuple[str, ...]]) -> None:
     if not recommended_actions:
         return
 
-    if args.build:
+    if args.build or args.build_only_commands:
         for action in recommended_actions:
             # action format is ("bazel", "command", "arg1", "arg2", ...)
             run_bazel_command(*action[1:], verbose=args.verbose)
